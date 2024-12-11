@@ -1,6 +1,16 @@
+import org.uma.jmetal.algorithm.Algorithm;
+import org.uma.jmetal.algorithm.singleobjective.geneticalgorithm.GeneticAlgorithmBuilder;
+import org.uma.jmetal.operator.crossover.CrossoverOperator;
+import org.uma.jmetal.operator.crossover.impl.IntegerSBXCrossover;
+import org.uma.jmetal.operator.mutation.MutationOperator;
+import org.uma.jmetal.operator.mutation.impl.IntegerPolynomialMutation;
+import org.uma.jmetal.operator.selection.SelectionOperator;
+import org.uma.jmetal.operator.selection.impl.BinaryTournamentSelection;
 import org.uma.jmetal.problem.integerproblem.impl.AbstractIntegerProblem;
 import org.uma.jmetal.solution.integersolution.IntegerSolution;
 import org.uma.jmetal.solution.integersolution.impl.DefaultIntegerSolution;
+import org.uma.jmetal.util.comparator.DominanceComparator;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,11 +59,21 @@ public class NIntegerMin extends AbstractIntegerProblem {
             newSolution.getVariables().set(i, randomValue);
         }
 
-        // Evaluamos la solución
-        problem.evaluate(newSolution);
+        CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.9, 20.0);
+        MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(1.0 / problem.getNumberOfVariables(), 20.0);
+        SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(new DominanceComparator<>());
+
+        Algorithm<IntegerSolution> algorithm = new GeneticAlgorithmBuilder<>(problem, crossover, mutation)
+                .setSelectionOperator(selection)
+                .setMaxEvaluations(1000)
+                .setPopulationSize(100)
+                .build();
+
+        // Ejecutar el algoritmo
+        algorithm.run();
 
         // Imprimir la solución y su evaluación
-        System.out.println("Solution: " + newSolution.getVariables());
-        System.out.println("Objective (Approximation to " + n + "): " + newSolution.getObjectives()[0]);
+        System.out.println("Solution: " + algorithm.getResult().getVariables());
+        System.out.println("Objective: " + algorithm.getResult().getObjectives()[0]);
     }
 }
