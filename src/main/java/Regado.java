@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class Regado extends AbstractIntegerProblem {
 	// Conteo de evaluaciones
-	private int cantidadEvaluaciones;
+	private int cantidadEvaluaciones = 0;
 
 	// Tablero que representa el tipo de cultivo en cada parcela del campo
 	String[][] cultivosCampo;
@@ -19,9 +19,9 @@ public class Regado extends AbstractIntegerProblem {
 	int n;
 
 	// Constantes
-	private final int COSTO_TIPO_1 = 1;
-	private final int COSTO_TIPO_2 = 2;
-	private final int COSTO_TIPO_3 = 4;
+	private final int COSTO_TIPO_1 = 0;
+	private final int COSTO_TIPO_2 = 0;
+	private final int COSTO_TIPO_3 = 0;
 
 	// Parametro X que controla cuanto riegan los aspersores por minuto
 	// - Tipo 1: solo riega una cantidad X por minuto en la
@@ -89,6 +89,11 @@ public class Regado extends AbstractIntegerProblem {
 	@Override
 	public void evaluate(IntegerSolution solution) {
 		cantidadEvaluaciones++;
+		if (cantidadEvaluaciones % 10000 == 0) {
+			System.out.println("Evaluación numero " + cantidadEvaluaciones + " - Costo: " + solution.getObjective(1)
+					+ " - Desviación: " + solution.getObjective(0));
+		}
+
 		int costoTotal = 0;
 		double totalDiferenciaHidrica = 0.0;
 		double[][] riegoTotal = calcularRiegoTotalCampo(solution);
@@ -221,8 +226,7 @@ public class Regado extends AbstractIntegerProblem {
 	// Igual que la funcion calcularDesviacionHidricaParcela pero esta solo se usa
 	// para imprimir la tabla final, mostrando donde
 	// faltó agua y donde sobró (incluyendo signo negativo).
-	double calcularDesviacionHidricaRelativaParcela(IntegerSolution solution, int index,
-			double[][] riegoTotal) {
+	double calcularDesviacionHidricaRelativaParcela(IntegerSolution solution, int index, double[][] riegoTotal) {
 		double desviacionTotal = 0.0;
 		int indice_i_parcela = index / n;
 		int indice_j_parcela = index % n;

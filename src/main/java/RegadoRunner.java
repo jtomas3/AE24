@@ -14,16 +14,16 @@ import java.util.List;
 public class RegadoRunner {
 	public void runAlgorithm(Regado problem) {
 		// Configuración de los operadores
-		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.9, 20.0);
-		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(
-				10.0 / problem.getNumberOfVariables(), 20.0);
+		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.95, 20.0);
+		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.15, 8.0);
 		SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(
 				new RankingAndCrowdingDistanceComparator<>());
 
 		// Creación del algoritmo NSGA-II
 		Algorithm<List<IntegerSolution>> algorithm = new NSGAIIBuilder<IntegerSolution>(problem, crossover, mutation,
-				1000).setSelectionOperator(selection).setMaxEvaluations(900000).build();
+				1000).setSelectionOperator(selection).setMaxEvaluations(1000000).build();
 
+		System.out.println("Comenzando ejecución del algoritmo...");
 		// Ejecutar el algoritmo
 		algorithm.run();
 
