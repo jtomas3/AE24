@@ -15,6 +15,8 @@ public class CustomNSGAII<S extends Solution<?>> extends NSGAII<S> {
 
 	// Lista para almacenar los objetivos en cada generación
 	private final List<List<double[]>> evolutionData = new ArrayList<>();
+	private List<Double> objetivo1Avg = new ArrayList<>();
+	private List<Double> objetivo2Avg = new ArrayList<>();
 
 	public CustomNSGAII(Problem<S> problem, int maxEvaluations, int populationSize, int matingPoolSize,
 			int offspringPopulationSize, CrossoverOperator<S> crossoverOperator, MutationOperator<S> mutationOperator,
@@ -29,7 +31,15 @@ public class CustomNSGAII<S extends Solution<?>> extends NSGAII<S> {
 
 		// Registrar los objetivos actuales de la población
 		List<double[]> currentGenerationObjectives = new ArrayList<>();
+
+		// Para el promedio de objetivos
+		double objetivo1Sum = 0;
+		double objetivo2Sum = 0;
+
 		for (S solution : getPopulation()) {
+			objetivo1Sum += solution.getObjective(0);
+			objetivo2Sum += solution.getObjective(1);
+
 			double[] objectives = new double[solution.getNumberOfObjectives()];
 			for (int i = 0; i < solution.getNumberOfObjectives(); i++) {
 				objectives[i] = solution.getObjective(i);
@@ -37,6 +47,10 @@ public class CustomNSGAII<S extends Solution<?>> extends NSGAII<S> {
 			currentGenerationObjectives.add(objectives);
 		}
 		evolutionData.add(currentGenerationObjectives);
+
+		// Calcular promedio de objetivos y agregar a la lista
+		objetivo1Avg.add(objetivo1Sum / getPopulation().size());
+		objetivo2Avg.add(objetivo2Sum / getPopulation().size());
 	}
 
 	public List<List<double[]>> getEvolutionData() {
@@ -51,6 +65,21 @@ public class CustomNSGAII<S extends Solution<?>> extends NSGAII<S> {
 				for (double[] objectives : evolutionData.get(generation)) {
 					writer.append(String.format("%d,%.4f,%.4f\n", generation, objectives[0], objectives[1]));
 				}
+			}
+
+			writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void exportAvgObjectivesToCSV(String filePath) {
+		try (FileWriter writer = new FileWriter(filePath)) {
+			writer.append("Generation,AvgObjective1,AvgObjective2\n"); // Encabezados de las columnas
+
+			for (int generation = 0; generation < objetivo1Avg.size(); generation++) {
+				writer.append(String.format("%d,%.4f,%.4f\n", generation, objetivo1Avg.get(generation),
+						objetivo2Avg.get(generation)));
 			}
 
 			writer.flush();

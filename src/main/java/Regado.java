@@ -19,9 +19,9 @@ public class Regado extends AbstractIntegerProblem {
 	int n;
 
 	// Constantes
-	private final int COSTO_TIPO_1 = 0;
-	private final int COSTO_TIPO_2 = 0;
-	private final int COSTO_TIPO_3 = 0;
+	private final int COSTO_TIPO_1 = 1;
+	private final int COSTO_TIPO_2 = 3;
+	private final int COSTO_TIPO_3 = 5;
 
 	// Parametro X que controla cuanto riegan los aspersores por minuto
 	// - Tipo 1: solo riega una cantidad X por minuto en la

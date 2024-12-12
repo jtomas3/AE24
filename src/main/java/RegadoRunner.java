@@ -30,6 +30,7 @@ public class RegadoRunner {
 
 		// Exportar datos de evolución
 		algorithm.exportEvolutionDataToCSV("evolutionData.csv");
+		algorithm.exportAvgObjectivesToCSV("objectiveAverages.csv");
 
 		// Obtención de la solución
 		List<IntegerSolution> population = algorithm.getResult();
