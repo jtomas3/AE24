@@ -19,21 +19,21 @@ public class Regado extends AbstractIntegerProblem {
 	// Conteo de evaluaciones
 	private int cantidadEvaluaciones;
 
-	// Tablero que representa el campo con los cultivos
+	// Tablero que representa el tipo de cultivo en cada parcela del campo
 	private String[][] cultivosCampo;
 
-	// Tablero que representa el campo con los tipo de suelo
+	// Tablero que representa el tipo de suelo en cada parcela del campo
 	private String[][] suelosCampo;
 
 	// Dimensiones del campo (nxn)
 	private int n;
 
 	// Constantes
-	private final int COSTO_TIPO_1 = 4;
-	private final int COSTO_TIPO_2 = 5;
-	private final int COSTO_TIPO_3 = 6;
+	private final int COSTO_TIPO_1 = 1;
+	private final int COSTO_TIPO_2 = 2;
+	private final int COSTO_TIPO_3 = 4;
 
-	// Variable X que controla cuanto riegan los aspersores por minuto
+	// Parametro X que controla cuanto riegan los aspersores por minuto
 	// - Tipo 1: solo riega una cantidad X por minuto en la
 	// parcela donde es posicionado.
 	// - Tipo 2: riega X por minuto en la parcela actual, y
@@ -43,20 +43,22 @@ public class Regado extends AbstractIntegerProblem {
 	// unidad más distante.
 	private final int x = 10;
 
-	// Variables de regado para aspersores: alpha, beta (distancia 1 y 2
-	// respectivamente)
+	// Parametros alpha, beta de los aspersores (distancia 1 y 2 respectivamente)
 	private final double alpha;
 	private final double beta;
 
 	// Mapa con key como tipo de suelo y value como un hash con keys:
 	// - "h_campo": Capacidad de campo
 	// - "h_marchitez": Punto de marchitez
+	// Ejemplo: { "tipo1": { "h_campo": 25.0, "h_marchitez": 12.0 } }
 	private final Map<String, Map<String, Double>> informacionSuelos;
 
 	// Mapa con key como tipo de cultivo y value como un hash con keys:
 	// - "agua_requerida": Cantidad de agua requerida en 24 hs
 	// - "tolerancia_sobre": Factor de tolerancia a sobre irrigación
 	// - "tolerancia_infra": Factor de tolerancia a infra irrigación
+	// Ejemplo: { "cultivo1": { "agua_requerida": 50.0, "tolerancia_sobre": 1.0,
+	// "tolerancia_infra": 1.0 } }
 	private final Map<String, Map<String, Double>> informacionCultivos;
 
 	public Regado(int n, Map<String, Map<String, Double>> informacionSuelos,
@@ -77,15 +79,15 @@ public class Regado extends AbstractIntegerProblem {
 		List<Integer> lowerLimit = new ArrayList<>(getNumberOfVariables());
 		List<Integer> upperLimit = new ArrayList<>(getNumberOfVariables());
 		for (int i = 0; i < getNumberOfVariables(); i++) {
-            if (i <= getNumberOfVariables() / 2) {
-                // Tipos de aspersores
-                lowerLimit.add(0);
-                upperLimit.add(3);
-            } else {
-                // Tiempos de riego en minuto
-                lowerLimit.add(0);
-                upperLimit.add(10);
-            }
+			if (i < getNumberOfVariables() / 2) {
+				// Tipos de aspersores
+				lowerLimit.add(0);
+				upperLimit.add(3);
+			} else {
+				// Tiempos de riego en minuto
+				lowerLimit.add(0);
+				upperLimit.add(60);
+			}
 		}
 
 		// Los valores posibles para cada una de las nxn variables (parcelas) son 0 si
@@ -101,28 +103,31 @@ public class Regado extends AbstractIntegerProblem {
 		double totalDiferenciaHidrica = 0.0;
 		double[][] riegoTotal = calcularRiegoTotalCampo(solution);
 
-		// Cálculo de costo y desviación. Solo vemos los aspersores, los tiempos son consecuencia
+		// Cálculo de costo y diferencia hidrica. Solo vemos los aspersores, los tiempos
+		// son consecuencia
 		for (int i = 0; i < solution.getNumberOfVariables() / 2; i++) {
 			int tipoAspersor = solution.getVariable(i);
 
 			costoTotal += calcularCosto(tipoAspersor); // Calcula el costo basado en el tipo
-			totalDiferenciaHidrica += calcularDesviacionHidricaParcela(solution, i, riegoTotal); // Calcula la desviación hidrica
+			totalDiferenciaHidrica += calcularDesviacionHidricaParcela(solution, i, riegoTotal); // Calcula la
+																									// desviación
+																									// hidrica
 		}
 
-		if ((cantidadEvaluaciones % 10000) == 0) {
-			System.out.println("Evaluación numero " + cantidadEvaluaciones);
-			// Imprimir solucion actual en forma matricial
-			for (int i = 0; i < n; i++) {
-				for (int j = 0; j < n; j++) {
-					int index = i * n + j;
-					System.out.print(solution.getVariable(index) + " ");
-				}
-				System.out.println();
-			}
-			System.out.println("----");
-			System.out.println("Costo total: " + costoTotal);
-			System.out.println("Desviación total: " + totalDiferenciaHidrica);
-		}
+//		if ((cantidadEvaluaciones % 10000) == 0) {
+//			System.out.println("Evaluación numero " + cantidadEvaluaciones);
+//			// Imprimir solucion actual en forma matricial
+//			for (int i = 0; i < n; i++) {
+//				for (int j = 0; j < n; j++) {
+//					int index = i * n + j;
+//					System.out.print(solution.getVariable(index) + " ");
+//				}
+//				System.out.println();
+//			}
+//			System.out.println("----");
+//			System.out.println("Costo total: " + costoTotal);
+//			System.out.println("Desviación total: " + totalDiferenciaHidrica);
+//		}
 
 		// Establecer los objetivos
 		solution.setObjective(0, totalDiferenciaHidrica);
@@ -155,7 +160,7 @@ public class Regado extends AbstractIntegerProblem {
 				int index = i * n + j; // Convertir coordenadas 2D a índice lineal para acceder a la solución
 				int tipoAspersor = solution.getVariable(index);
 				if (tipoAspersor != 0) {
-                    int tiempoEncendido = solution.getVariable(index + n * n);
+					int tiempoEncendido = solution.getVariable(index + n * n);
 					riegoTotal[i][j] += x * tiempoEncendido; // Riego en la parcela actual
 					if (tipoAspersor == 2 || tipoAspersor == 3) {
 						// Riego en las parcelas adyacentes (a distancia 1)
@@ -223,9 +228,11 @@ public class Regado extends AbstractIntegerProblem {
 		return desviacionTotal;
 	}
 
-	// Igual que la funcion calcularDesviacionHidricaParcela pero esta solo se usa para imprimir la tabla final, mostrando donde
+	// Igual que la funcion calcularDesviacionHidricaParcela pero esta solo se usa
+	// para imprimir la tabla final, mostrando donde
 	// faltó agua y donde sobró (incluyendo signo negativo).
-	private double calcularDesviacionHidricaRelativaParcela(IntegerSolution solution, int index, double[][] riegoTotal) {
+	private double calcularDesviacionHidricaRelativaParcela(IntegerSolution solution, int index,
+			double[][] riegoTotal) {
 		double desviacionTotal = 0.0;
 		int indice_i_parcela = index / n;
 		int indice_j_parcela = index % n;
@@ -270,7 +277,7 @@ public class Regado extends AbstractIntegerProblem {
 
 		// Configuración del algoritmo NSGA-II
 		Algorithm<List<IntegerSolution>> algorithm = new NSGAIIBuilder<IntegerSolution>(problema, crossover, mutation,
-				2000).setSelectionOperator(selection).setMaxEvaluations(300000).build();
+				1000).setSelectionOperator(selection).setMaxEvaluations(900000).build();
 
 		// Ejecución del algoritmo
 		algorithm.run();
@@ -289,20 +296,36 @@ public class Regado extends AbstractIntegerProblem {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				int index = i * n + j;
-				System.out.print(bestSolution.getVariable(index) + " (" + bestSolution.getVariable(index + (n*n)) + " min.) ");
+				System.out.print(
+						bestSolution.getVariable(index) + " (" + bestSolution.getVariable(index + (n * n)) + " min.) ");
 			}
 			System.out.println();
 		}
-		
-		// Calcular diferencia hídrica de cada parcela
+
 		double[][] riegoTotal = problema.calcularRiegoTotalCampo(bestSolution);
-		double[][] desviacionHidrica = new double[n][n];
-		// Imprimir campo
-        System.out.println("Balance de riego:");
+
+		// Imprimir el agua optima y real en cada parcela
+		System.out.println("Agua óptima y real:");
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				int index = i * n + j;
-				desviacionHidrica[i][j] = problema.calcularDesviacionHidricaRelativaParcela(bestSolution, index, riegoTotal);
+				double aguaOptima = problema.informacionSuelos.get(problema.suelosCampo[i][j]).get("h_campo")
+						- problema.informacionSuelos.get(problema.suelosCampo[i][j]).get("h_marchitez")
+						+ problema.informacionCultivos.get(problema.cultivosCampo[i][j]).get("agua_requerida");
+				System.out.print(aguaOptima + " (" + riegoTotal[i][j] + ") ");
+			}
+			System.out.println();
+		}
+
+		// Calcular diferencia hídrica de cada parcela
+		double[][] desviacionHidrica = new double[n][n];
+		// Imprimir campo
+		System.out.println("Balance de riego:");
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				int index = i * n + j;
+				desviacionHidrica[i][j] = problema.calcularDesviacionHidricaRelativaParcela(bestSolution, index,
+						riegoTotal);
 				System.out.print(desviacionHidrica[i][j] + " ");
 			}
 			System.out.println();
@@ -322,7 +345,7 @@ public class Regado extends AbstractIntegerProblem {
 		tipoSuelo1.put("h_campo", 25.0);
 		tipoSuelo1.put("h_marchitez", 12.0);
 		informacionSuelos.put("tipo1", tipoSuelo1);
-		
+
 		Map<String, Double> tipoSuelo2 = new HashMap<>();
 		tipoSuelo2.put("h_campo", 90.0);
 		tipoSuelo2.put("h_marchitez", 80.0);
@@ -336,7 +359,7 @@ public class Regado extends AbstractIntegerProblem {
 
 		// Datos ficticios
 		Map<String, Double> tipoCultivo1 = new HashMap<>();
-		tipoCultivo1.put("agua_requerida", 50.0);
+		tipoCultivo1.put("agua_requerida", 250.0);
 		tipoCultivo1.put("tolerancia_sobre", 1.0);
 		tipoCultivo1.put("tolerancia_infra", 1.0);
 		informacionCultivos.put("cultivo1", tipoCultivo1);
