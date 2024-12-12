@@ -8,6 +8,7 @@ import org.uma.jmetal.operator.selection.SelectionOperator;
 import org.uma.jmetal.operator.selection.impl.BinaryTournamentSelection;
 import org.uma.jmetal.solution.integersolution.IntegerSolution;
 import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
+import org.uma.jmetal.util.evaluator.impl.SequentialSolutionListEvaluator;
 
 import java.util.List;
 
@@ -20,12 +21,15 @@ public class RegadoRunner {
 				new RankingAndCrowdingDistanceComparator<>());
 
 		// Creación del algoritmo NSGA-II
-		Algorithm<List<IntegerSolution>> algorithm = new NSGAIIBuilder<IntegerSolution>(problem, crossover, mutation,
-				1000).setSelectionOperator(selection).setMaxEvaluations(1000000).build();
+		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 1000000, 1000, 1000, 1000, crossover,
+				mutation, selection, new SequentialSolutionListEvaluator<>());
 
 		System.out.println("Comenzando ejecución del algoritmo...");
 		// Ejecutar el algoritmo
 		algorithm.run();
+
+		// Exportar datos de evolución
+		algorithm.exportEvolutionDataToCSV("evolutionData.csv");
 
 		// Obtención de la solución
 		List<IntegerSolution> population = algorithm.getResult();
