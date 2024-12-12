@@ -16,9 +16,9 @@ public class Regado extends AbstractIntegerProblem {
 	int n;
 
 	// Constantes
-	private final int COSTO_TIPO_1 = 1;
-	private final int COSTO_TIPO_2 = 3;
-	private final int COSTO_TIPO_3 = 5;
+	private final int COSTO_TIPO_1;
+	private final int COSTO_TIPO_2;
+	private final int COSTO_TIPO_3;
 
 	// Parametro X que controla cuanto riegan los aspersores por minuto
 	// - Tipo 1: solo riega una cantidad X por minuto en la
@@ -28,7 +28,7 @@ public class Regado extends AbstractIntegerProblem {
 	// - Tipo 3: Como el Tipo 2, pero riega a su vez una
 	// cantidad X · beta de agua por minuto en parcelas una
 	// unidad más distante.
-	private final int x = 10;
+	private final int x;
 
 	// Parametros alpha, beta de los aspersores (distancia 1 y 2 respectivamente)
 	private final double alpha;
@@ -50,7 +50,7 @@ public class Regado extends AbstractIntegerProblem {
 
 	public Regado(int n, Map<String, Map<String, Double>> informacionSuelos,
 			Map<String, Map<String, Double>> informacionCultivos, String[][] cultivosCampo, String[][] sueslosCampo,
-			double alpha, double beta) {
+			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto) {
 		this.n = n;
 		this.informacionSuelos = informacionSuelos;
 		this.informacionCultivos = informacionCultivos;
@@ -58,6 +58,10 @@ public class Regado extends AbstractIntegerProblem {
 		this.suelosCampo = sueslosCampo;
 		this.alpha = alpha;
 		this.beta = beta;
+		this.COSTO_TIPO_1 = costoTipo1;
+		this.COSTO_TIPO_2 = costoTipo2;
+		this.COSTO_TIPO_3 = costoTipo3;
+		this.x = riegoPorMinuto;
 
 		setNumberOfVariables(n * n * 2);
 		setNumberOfObjectives(2);

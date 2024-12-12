@@ -15,8 +15,8 @@ import java.util.List;
 public class RegadoRunner {
 	public void runAlgorithm(Regado problem) {
 		// Configuración de los operadores
-		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.7, 20.0);
-		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.1, 8.0);
+		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.5, 20.0);
+		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.01, 8.0);
 		SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(
 				new RankingAndCrowdingDistanceComparator<>());
 
