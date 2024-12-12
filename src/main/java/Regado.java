@@ -1,32 +1,22 @@
-import org.uma.jmetal.algorithm.Algorithm;
-import org.uma.jmetal.operator.crossover.CrossoverOperator;
-import org.uma.jmetal.operator.crossover.impl.IntegerSBXCrossover;
-import org.uma.jmetal.operator.mutation.MutationOperator;
-import org.uma.jmetal.operator.mutation.impl.IntegerPolynomialMutation;
-import org.uma.jmetal.operator.selection.SelectionOperator;
-import org.uma.jmetal.operator.selection.impl.BinaryTournamentSelection;
 import org.uma.jmetal.problem.integerproblem.impl.AbstractIntegerProblem;
 import org.uma.jmetal.solution.integersolution.IntegerSolution;
-import org.uma.jmetal.algorithm.multiobjective.nsgaii.NSGAIIBuilder;
-import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 public class Regado extends AbstractIntegerProblem {
 	// Conteo de evaluaciones
 	private int cantidadEvaluaciones;
 
 	// Tablero que representa el tipo de cultivo en cada parcela del campo
-	private String[][] cultivosCampo;
+	String[][] cultivosCampo;
 
 	// Tablero que representa el tipo de suelo en cada parcela del campo
-	private String[][] suelosCampo;
+	String[][] suelosCampo;
 
 	// Dimensiones del campo (nxn)
-	private int n;
+	int n;
 
 	// Constantes
 	private final int COSTO_TIPO_1 = 1;
@@ -51,7 +41,7 @@ public class Regado extends AbstractIntegerProblem {
 	// - "h_campo": Capacidad de campo
 	// - "h_marchitez": Punto de marchitez
 	// Ejemplo: { "tipo1": { "h_campo": 25.0, "h_marchitez": 12.0 } }
-	private final Map<String, Map<String, Double>> informacionSuelos;
+	final Map<String, Map<String, Double>> informacionSuelos;
 
 	// Mapa con key como tipo de cultivo y value como un hash con keys:
 	// - "agua_requerida": Cantidad de agua requerida en 24 hs
@@ -59,7 +49,7 @@ public class Regado extends AbstractIntegerProblem {
 	// - "tolerancia_infra": Factor de tolerancia a infra irrigación
 	// Ejemplo: { "cultivo1": { "agua_requerida": 50.0, "tolerancia_sobre": 1.0,
 	// "tolerancia_infra": 1.0 } }
-	private final Map<String, Map<String, Double>> informacionCultivos;
+	final Map<String, Map<String, Double>> informacionCultivos;
 
 	public Regado(int n, Map<String, Map<String, Double>> informacionSuelos,
 			Map<String, Map<String, Double>> informacionCultivos, String[][] cultivosCampo, String[][] sueslosCampo,
@@ -147,7 +137,7 @@ public class Regado extends AbstractIntegerProblem {
 		}
 	}
 
-	private double[][] calcularRiegoTotalCampo(IntegerSolution solution) {
+	double[][] calcularRiegoTotalCampo(IntegerSolution solution) {
 		// Matriz de nxn que representa riego de cada parcela
 		double[][] riegoTotal = new double[n][n];
 
@@ -231,7 +221,7 @@ public class Regado extends AbstractIntegerProblem {
 	// Igual que la funcion calcularDesviacionHidricaParcela pero esta solo se usa
 	// para imprimir la tabla final, mostrando donde
 	// faltó agua y donde sobró (incluyendo signo negativo).
-	private double calcularDesviacionHidricaRelativaParcela(IntegerSolution solution, int index,
+	double calcularDesviacionHidricaRelativaParcela(IntegerSolution solution, int index,
 			double[][] riegoTotal) {
 		double desviacionTotal = 0.0;
 		int indice_i_parcela = index / n;
@@ -253,146 +243,5 @@ public class Regado extends AbstractIntegerProblem {
 		desviacionTotal += Math.pow(aguaReal - aguaOptima, toleranciaSobre);
 
 		return desviacionTotal;
-	}
-
-	public static void main(String[] args) {
-		int n = 10; // Dimensiones del campo (10x10 por ejemplo)
-		Map<String, Map<String, Double>> informacionSuelos = obtenerInformacionSuelos();
-		Map<String, Map<String, Double>> informacionCultivos = obtenerInformacionCultivos();
-		String[][] cultivosCampo = obtenerCultivosCampo();
-		String[][] suelosCampo = obtenerSuelosCampo();
-		double alpha = 0.7;
-		double beta = 0.3;
-
-		// Creación del problema
-		Regado problema = new Regado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo, alpha,
-				beta);
-
-		// Configuración de los operadores de cruce, mutación y selección
-		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.9, 20.0);
-		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(
-				10.0 / problema.getNumberOfVariables(), 20.0);
-		SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(
-				new RankingAndCrowdingDistanceComparator<>());
-
-		// Configuración del algoritmo NSGA-II
-		Algorithm<List<IntegerSolution>> algorithm = new NSGAIIBuilder<IntegerSolution>(problema, crossover, mutation,
-				1000).setSelectionOperator(selection).setMaxEvaluations(900000).build();
-
-		// Ejecución del algoritmo
-		algorithm.run();
-
-		// Obtención de la solución
-		List<IntegerSolution> population = algorithm.getResult();
-		IntegerSolution bestSolution = population.get(0);
-		for (int i = 1; i < population.size(); i++) {
-			if (population.get(i).getObjective(0) < bestSolution.getObjective(0)) {
-				bestSolution = population.get(i);
-			}
-		}
-
-		// Imprimir la solución como matriz
-		System.out.println("Solución:");
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				int index = i * n + j;
-				System.out.print(
-						bestSolution.getVariable(index) + " (" + bestSolution.getVariable(index + (n * n)) + " min.) ");
-			}
-			System.out.println();
-		}
-
-		double[][] riegoTotal = problema.calcularRiegoTotalCampo(bestSolution);
-
-		// Imprimir el agua optima y real en cada parcela
-		System.out.println("Agua óptima y real:");
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				int index = i * n + j;
-				double aguaOptima = problema.informacionSuelos.get(problema.suelosCampo[i][j]).get("h_campo")
-						- problema.informacionSuelos.get(problema.suelosCampo[i][j]).get("h_marchitez")
-						+ problema.informacionCultivos.get(problema.cultivosCampo[i][j]).get("agua_requerida");
-				System.out.print(aguaOptima + " (" + riegoTotal[i][j] + ") ");
-			}
-			System.out.println();
-		}
-
-		// Calcular diferencia hídrica de cada parcela
-		double[][] desviacionHidrica = new double[n][n];
-		// Imprimir campo
-		System.out.println("Balance de riego:");
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				int index = i * n + j;
-				desviacionHidrica[i][j] = problema.calcularDesviacionHidricaRelativaParcela(bestSolution, index,
-						riegoTotal);
-				System.out.print(desviacionHidrica[i][j] + " ");
-			}
-			System.out.println();
-		}
-
-		System.out.println("Objective 1 (Diferencia hídrica total): " + bestSolution.getObjective(0));
-		System.out.println("Objective 2 (Costo): " + bestSolution.getObjective(1));
-	}
-
-	// Métodos ficticios para obtener información, reemplaza con tus métodos o datos
-	// reales
-	private static Map<String, Map<String, Double>> obtenerInformacionSuelos() {
-		Map<String, Map<String, Double>> informacionSuelos = new HashMap<>();
-
-		// Datos ficticios
-		Map<String, Double> tipoSuelo1 = new HashMap<>();
-		tipoSuelo1.put("h_campo", 25.0);
-		tipoSuelo1.put("h_marchitez", 12.0);
-		informacionSuelos.put("tipo1", tipoSuelo1);
-
-		Map<String, Double> tipoSuelo2 = new HashMap<>();
-		tipoSuelo2.put("h_campo", 90.0);
-		tipoSuelo2.put("h_marchitez", 80.0);
-		informacionSuelos.put("tipo2", tipoSuelo2);
-
-		return informacionSuelos;
-	}
-
-	private static Map<String, Map<String, Double>> obtenerInformacionCultivos() {
-		Map<String, Map<String, Double>> informacionCultivos = new HashMap<>();
-
-		// Datos ficticios
-		Map<String, Double> tipoCultivo1 = new HashMap<>();
-		tipoCultivo1.put("agua_requerida", 250.0);
-		tipoCultivo1.put("tolerancia_sobre", 1.0);
-		tipoCultivo1.put("tolerancia_infra", 1.0);
-		informacionCultivos.put("cultivo1", tipoCultivo1);
-
-		return informacionCultivos;
-	}
-
-	private static String[][] obtenerCultivosCampo() {
-		String[][] cultivosCampo = new String[10][10];
-
-		// Datos ficticios
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				cultivosCampo[i][j] = "cultivo1";
-			}
-		}
-
-		return cultivosCampo;
-	}
-
-	private static String[][] obtenerSuelosCampo() {
-		String[][] suelosCampo = new String[10][10];
-
-		// Datos ficticios
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				if (j < 5)
-					suelosCampo[i][j] = "tipo1";
-				else
-					suelosCampo[i][j] = "tipo2";
-			}
-		}
-
-		return suelosCampo;
 	}
 }
