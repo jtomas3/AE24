@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Regado extends AbstractIntegerProblem {
-	// Conteo de evaluaciones
-	private int cantidadEvaluaciones = 0;
-
 	// Tablero que representa el tipo de cultivo en cada parcela del campo
 	String[][] cultivosCampo;
 
@@ -88,12 +85,6 @@ public class Regado extends AbstractIntegerProblem {
 
 	@Override
 	public void evaluate(IntegerSolution solution) {
-		cantidadEvaluaciones++;
-		if (cantidadEvaluaciones % 10000 == 0) {
-			System.out.println("Evaluación numero " + cantidadEvaluaciones + " - Costo: " + solution.getObjective(1)
-					+ " - Desviación: " + solution.getObjective(0));
-		}
-
 		int costoTotal = 0;
 		double totalDiferenciaHidrica = 0.0;
 		double[][] riegoTotal = calcularRiegoTotalCampo(solution);

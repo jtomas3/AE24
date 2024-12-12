@@ -17,6 +17,7 @@ public class CustomNSGAII<S extends Solution<?>> extends NSGAII<S> {
 	private final List<List<double[]>> evolutionData = new ArrayList<>();
 	private List<Double> objetivo1Avg = new ArrayList<>();
 	private List<Double> objetivo2Avg = new ArrayList<>();
+	private int generation = 0;
 
 	public CustomNSGAII(Problem<S> problem, int maxEvaluations, int populationSize, int matingPoolSize,
 			int offspringPopulationSize, CrossoverOperator<S> crossoverOperator, MutationOperator<S> mutationOperator,
@@ -28,6 +29,9 @@ public class CustomNSGAII<S extends Solution<?>> extends NSGAII<S> {
 	@Override
 	protected void updateProgress() {
 		super.updateProgress();
+
+		// Incrementar el contador de generaciones
+		generation++;
 
 		// Registrar los objetivos actuales de la población
 		List<double[]> currentGenerationObjectives = new ArrayList<>();
@@ -51,6 +55,10 @@ public class CustomNSGAII<S extends Solution<?>> extends NSGAII<S> {
 		// Calcular promedio de objetivos y agregar a la lista
 		objetivo1Avg.add(objetivo1Sum / getPopulation().size());
 		objetivo2Avg.add(objetivo2Sum / getPopulation().size());
+
+		if (generation % 10 == 0) {
+			printGenerationInformation();
+		}
 	}
 
 	public List<List<double[]>> getEvolutionData() {
@@ -86,5 +94,10 @@ public class CustomNSGAII<S extends Solution<?>> extends NSGAII<S> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void printGenerationInformation() {
+		System.out.println("Generación " + generation + " - Promedio de objetivos (Diferencia Hídrica, Costo): "
+				+ objetivo1Avg.get(generation - 1) + ", " + objetivo2Avg.get(generation - 1));
 	}
 }
