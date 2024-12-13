@@ -12,6 +12,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class RegadoRunner {
 	public void runAlgorithmOnce(Regado problem) {
@@ -64,11 +68,31 @@ public class RegadoRunner {
 
 	public void runMultipleExecutions(Regado problem, int numExecutions) {
 		List<IntegerSolution> bestSolutions = new ArrayList<>();
+		ExecutorService executorService = Executors.newFixedThreadPool(numExecutions);
+		List<Callable<IntegerSolution>> tasks = new ArrayList<>();
 
 		for (int i = 0; i < numExecutions; i++) {
-			System.out.println("Ejecución " + (i + 1) + " de " + numExecutions);
-			IntegerSolution bestSolution = runAlgorithm(problem);
-			bestSolutions.add(bestSolution);
+			// Crear una tarea para cada ejecución
+			tasks.add(() -> runAlgorithm(problem));
+		}
+
+		try {
+			System.out.println("Iniciando ejecuciones concurrentes...");
+			// Ejecutar todas las tareas y obtener los resultados
+			List<Future<IntegerSolution>> results = executorService.invokeAll(tasks);
+
+			// Procesar los resultados de cada ejecución
+			for (Future<IntegerSolution> future : results) {
+				try {
+					bestSolutions.add(future.get()); // Obtener la solución de cada ejecución
+				} catch (Exception e) {
+					System.err.println("Error durante la ejecución: " + e.getMessage());
+				}
+			}
+		} catch (InterruptedException e) {
+			System.err.println("La ejecución fue interrumpida: " + e.getMessage());
+		} finally {
+			executorService.shutdown(); // Cerrar el pool de hilos
 		}
 
 		exportBestSolutionsToCSV(bestSolutions, "solutionsFromMultipleRuns.csv");
@@ -83,7 +107,7 @@ public class RegadoRunner {
 				new RankingAndCrowdingDistanceComparator<>());
 
 		// Creación del algoritmo NSGA-II
-		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 1000000, 100, 100, 100, crossover,
+		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 2000000, 20, 20, 20, crossover,
 				mutation, selection, new SequentialSolutionListEvaluator<>());
 
 		System.out.println("Comenzando ejecución del algoritmo...");
