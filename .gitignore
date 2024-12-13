@@ -1,0 +1,10 @@
+/target/
+.idea
+
+.settings
+.metadata
+.classpath
+.project
+
+evolutionData.csv
+avgAndBestEvolution.csv
