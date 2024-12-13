@@ -239,7 +239,11 @@ public class Regado extends AbstractIntegerProblem {
 		// Calcular cantidad de agua optima
 		double aguaOptima = capacidadCampo - puntoMarchitez + aguaRequerida;
 
-		desviacionTotal += Math.pow(aguaReal - aguaOptima, toleranciaSobre);
+		if (aguaReal > aguaOptima) {
+			desviacionTotal += Math.pow(aguaReal - aguaOptima, toleranciaSobre);
+		} else {
+			desviacionTotal -= Math.pow(aguaOptima - aguaReal, toleranciaInfra);
+		}
 
 		return desviacionTotal;
 	}
