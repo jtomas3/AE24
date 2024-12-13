@@ -40,6 +40,14 @@ public class Main {
 			runner.runMultipleExecutions(problema, numEjecuciones);
 			break;
 
+		case 3:
+			// Instanciar el algoritmo Greedy para comparar
+			GreedyRegado greedy = new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
+					alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto);
+
+			greedy.ejecutar();
+			break;
+
 		default:
 			System.out.println("Opción inválida. Saliendo del programa.");
 			break;
