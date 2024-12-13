@@ -1,4 +1,5 @@
 import java.util.Map;
+import java.util.Scanner;
 
 public class Main {
 	public static void main(String[] args) {
@@ -16,11 +17,34 @@ public class Main {
 		String[][] suelosCampo = GeneracionDatos.obtenerSuelosCampo(n);
 
 		// Crear una instancia del problema
-		Regado problema = new Regado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo, alpha,
-				beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto);
+		Regado problema = new Regado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo, alpha, beta,
+				costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto);
 
-		// Crear y ejecutar el algoritmo
 		RegadoRunner runner = new RegadoRunner();
-		runner.runAlgorithm(problema);
+
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Seleccione una opción:");
+		System.out.println("1. Ejecutar el algoritmo una vez");
+		System.out.println("2. Ejecutar el algoritmo múltiples veces");
+		int opcion = scanner.nextInt();
+
+		switch (opcion) {
+		case 1:
+			System.out.println("Ejecutando el algoritmo una vez...");
+			runner.runAlgorithmOnce(problema);
+			break;
+
+		case 2:
+			System.out.println("Ingrese el número de ejecuciones:");
+			int numEjecuciones = scanner.nextInt();
+			runner.runMultipleExecutions(problema, numEjecuciones);
+			break;
+
+		default:
+			System.out.println("Opción inválida. Saliendo del programa.");
+			break;
+		}
+
+		scanner.close();
 	}
 }
