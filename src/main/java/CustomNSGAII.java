@@ -70,7 +70,7 @@ public class CustomNSGAII<S extends Solution<?>> extends NSGAII<S> {
 		objetivo1Best.add(minObj1);
 		objetivo2Best.add(minObj2);
 
-		if (generation % 10 == 0) {
+		if (generation % 1000 == 0) {
 			printGenerationInformation();
 		}
 
