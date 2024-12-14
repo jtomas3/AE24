@@ -130,19 +130,71 @@ public class RegadoRunner {
 			}
 		}
 
+		// Calcular la media y desviacion estandar de las soluciones para cada objetivo
+		double avgObjective0 = 0;
+		double avgObjective1 = 0;
+		double stdDevObjective0 = 0;
+		double stdDevObjective1 = 0;
+
+		for (IntegerSolution solution : population) {
+			avgObjective0 += solution.getObjective(0);
+			avgObjective1 += solution.getObjective(1);
+		}
+
+		avgObjective0 /= population.size();
+		avgObjective1 /= population.size();
+
+		for (IntegerSolution solution : population) {
+			stdDevObjective0 += Math.pow(solution.getObjective(0) - avgObjective0, 2);
+			stdDevObjective1 += Math.pow(solution.getObjective(1) - avgObjective1, 2);
+		}
+
+		stdDevObjective0 = Math.sqrt(stdDevObjective0 / population.size());
+		stdDevObjective1 = Math.sqrt(stdDevObjective1 / population.size());
+
+		System.out.println("Average Objective 0: " + avgObjective0);
+		System.out.println("Average Objective 1: " + avgObjective1);
+		System.out.println("Standard Deviation Objective 0: " + stdDevObjective0);
+		System.out.println("Standard Deviation Objective 1: " + stdDevObjective1);
+
+		System.out.println("Best solution Objective 0");
+		System.out.println("Objective 0: " + bestSolution.getObjective(0));
+		System.out.println("Objective 1: " + bestSolution.getObjective(1));
+
+		System.out.println(" ");
+		System.out.println("Printing all the population");
 		// Encuentra soluciones que prioricen el objetivo 0 más que el objetivo 1
 		List<IntegerSolution> prioritizedSolutions = new ArrayList<>();
 		for (IntegerSolution solution : population) {
 			// Calcula un score ponderado (puedes ajustar los pesos según necesites)
-			double normalizedObjective0 = (maxObjective0 - solution.getObjective(0)) / (maxObjective0 - 0); // Normalizar
-			double normalizedObjective1 = (maxObjective1 - solution.getObjective(1)) / (maxObjective1 - 0); // Normalizar
-			double weightedScore = 0.001 * normalizedObjective0 + 0.999 * normalizedObjective1; // Normalizar
+			// double normalizedObjective0 = (maxObjective0 - solution.getObjective(0)) / (maxObjective0 - 0); // Normalizar
+			// double normalizedObjective1 = (maxObjective1 - solution.getObjective(1)) / (maxObjective1 - 0); // Normalizar
+			// Normalizar los objetivos usando la media y desviación estándar, con valor absoluto
+			double normalizedObjective0 = Math.abs((solution.getObjective(0) - (avgObjective0 / 2)) / stdDevObjective0);
+			double normalizedObjective1 = Math.abs((solution.getObjective(1) - avgObjective1) / stdDevObjective1);
+			System.out.println("Objective 0: " + solution.getObjective(0));
+			System.out.println("Objective 1: " + solution.getObjective(1));
+			System.out.println("Max Objective 0: " + maxObjective0);
+			System.out.println("Max Objective 1: " + maxObjective1);
+			System.out.println("Normalized Objective 0: " + normalizedObjective0);
+			System.out.println("Normalized Objective 1: " + normalizedObjective1);
+			System.out.println(" ");
+			double weightedScore = 0.95 * normalizedObjective0 + 0.05 * normalizedObjective1; // Normalizar
 			solution.setAttribute("WeightedScore", weightedScore);
 			prioritizedSolutions.add(solution);
 		}
 
 		// Ordena las soluciones por el score ponderado
 		prioritizedSolutions.sort(Comparator.comparing(s -> (double) s.getAttribute("WeightedScore")));
+
+		System.out.println("----------------------");
+		System.out.println("Prioritized Solutions in Order ");
+		for (IntegerSolution solution : prioritizedSolutions) {
+			System.out.println("Objective 0: " + solution.getObjective(0));
+			System.out.println("Objective 1: " + solution.getObjective(1));
+			System.out.println("WeightedScore: " + solution.getAttribute("WeightedScore"));
+			System.out.println(" ");
+		}
 
 		// Selecciona las dos mejores soluciones según el score ponderado
 		IntegerSolution bestForObjective0More = prioritizedSolutions.get(0);
@@ -157,7 +209,9 @@ public class RegadoRunner {
 		for (IntegerSolution solution : bestSolutions) {
 				counter++;
 				int n = problem.n;
-
+				System.out.println(" ");
+				System.out.println("Objective 0: " + solution.getObjective(0));
+				System.out.println("Objective 1: " + solution.getObjective(1));
 				// Imprimir la solución como matriz
 				System.out.println("---------------------------------*");
 				System.out.println("Solución: "+ counter);
@@ -198,8 +252,8 @@ public class RegadoRunner {
 					System.out.println();
 				}
 
-				System.out.println("Objective 1 (Diferencia hídrica total): " + solution.getObjective(0));
-				System.out.println("Objective 2 (Costo): " + solution.getObjective(1));
+				System.out.println("Objective 0 (Diferencia hídrica total): " + solution.getObjective(0));
+				System.out.println("Objective 1 (Costo): " + solution.getObjective(1));
 			}
 		return bestSolution;
 	}
