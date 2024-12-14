@@ -15,6 +15,17 @@ public class Main {
 		Map<String, Map<String, Double>> informacionCultivos = GeneracionDatos.obtenerInformacionCultivos();
 		String[][] cultivosCampo = GeneracionDatos.obtenerCultivosCampo(n);
 		String[][] suelosCampo = GeneracionDatos.obtenerSuelosCampo(n);
+		// TODO: Pasarlo como parametro a Regado.java (está duplicado)
+		int tiempoMaximo = 60;
+
+		// Parametros
+		CalcularMaximos calculador = new CalcularMaximos(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
+				alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto);
+		int costoMaximo = calculador.calcularCostoMaximo(n, costoTipo1, costoTipo2, costoTipo3);
+		double desbalanceMaximo = calculador.calcularDesbalanceMaximo(n, tiempoMaximo);
+
+		System.out.println("Costo máximo: " + costoMaximo);
+		System.out.println("Desbalance máximo: " + desbalanceMaximo);
 
 		int[][] greedySolution;
 
@@ -64,13 +75,13 @@ public class Main {
 		switch (opcion2) {
 		case 1:
 			System.out.println("Ejecutando el algoritmo una vez...");
-			runner.runAlgorithmOnce(problema);
+			runner.runAlgorithmOnce(problema, desbalanceMaximo, costoMaximo);
 			break;
 
 		case 2:
 			System.out.println("Ingrese el número de ejecuciones:");
 			int numEjecuciones = scanner.nextInt();
-			runner.runMultipleExecutions(problema, numEjecuciones);
+			runner.runMultipleExecutions(problema, numEjecuciones, desbalanceMaximo, costoMaximo);
 			break;
 
 		default:
