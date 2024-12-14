@@ -1,10 +1,12 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
-		int n = 10;
+		int n = 30;
 		double alpha = 0.7;
 		double beta = 0.3;
 		int costoTipo1 = 1;
@@ -17,6 +19,7 @@ public class Main {
 		String[][] suelosCampo = GeneracionDatos.obtenerSuelosCampo(n);
 		// TODO: Pasarlo como parametro a Regado.java (está duplicado)
 		int tiempoMaximo = 60;
+		int tamañoPoblacion = 50;
 
 		// Parametros
 		CalcularMaximos calculador = new CalcularMaximos(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
@@ -27,7 +30,7 @@ public class Main {
 		System.out.println("Costo máximo: " + costoMaximo);
 		System.out.println("Desbalance máximo: " + desbalanceMaximo);
 
-		int[][] greedySolution;
+		List<int[][]> greedySolutions = new ArrayList<>();
 
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("Seleccione una opción:");
@@ -39,20 +42,27 @@ public class Main {
 		switch (opcion) {
 			case 1:
 				System.out.println("Algoritmo Genético fue seleccionado...");
-				greedySolution = null;
+				greedySolutions = null;
 				break;
 
 			case 2:
 				System.out.println("Algoritmo Genetico empezando con solucion Greedy fue seleccionado...");
-				System.out.println("Ejecutando greedy...");
-				greedySolution = new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
-						alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto).ejecutar();
+				System.out.println("Tamaño de la población: "+ tamañoPoblacion);
+				// Tomar 4/5 de la población como soluciones Greedy. Castear a int para redondear hacia abajo.
+				int cantidadGreedySolutions = (int) Math.floor(tamañoPoblacion * 4.0 / 5.0);
+				System.out.println("Cantidad de soluciones Greedy a generar: "+ cantidadGreedySolutions);
+				for (int i = 0; i < cantidadGreedySolutions; i++) {
+					System.out.println("Greedy numero " + i++);
+					greedySolutions.add(new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
+							alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto).ejecutar());
+					System.out.println("-------------------");
+				}				
 
 				break;
 
 			case 3:
 				System.out.println("Ejecutando Greedy...");
-				greedySolution = new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
+				new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
 						alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto).ejecutar();
 				return;
 
@@ -63,7 +73,7 @@ public class Main {
 
 		// Crear una instancia del problema
 		Regado problema = new Regado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo, alpha, beta,
-				costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto, greedySolution);
+				costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto, greedySolutions);
 
 		RegadoRunner runner = new RegadoRunner();
 

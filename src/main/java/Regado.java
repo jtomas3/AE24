@@ -35,8 +35,9 @@ public class Regado extends AbstractIntegerProblem {
 	private final double alpha;
 	private final double beta;
 
-	// Solucion dada por el algoritmo greedy. (Opcional)
-	private int[][] greedySolution;
+	// Soluciones dada por el algoritmo greedy. (Opcional)
+	private List<int[][]> greedySolutions;
+	private int indiceGreedySolution = 0;
 
 	// Mapa con key como tipo de suelo y value como un hash con keys:
 	// - "h_campo": Capacidad de campo
@@ -54,7 +55,7 @@ public class Regado extends AbstractIntegerProblem {
 
 	public Regado(int n, Map<String, Map<String, Double>> informacionSuelos,
 			Map<String, Map<String, Double>> informacionCultivos, String[][] cultivosCampo, String[][] sueslosCampo,
-			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto, int[][] greedySolution) {
+			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto, List<int[][]> greedySolutions) {
 		this.n = n;
 		this.informacionSuelos = informacionSuelos;
 		this.informacionCultivos = informacionCultivos;
@@ -66,7 +67,7 @@ public class Regado extends AbstractIntegerProblem {
 		this.COSTO_TIPO_2 = costoTipo2;
 		this.COSTO_TIPO_3 = costoTipo3;
 		this.x = riegoPorMinuto;
-		this.greedySolution = greedySolution;
+		this.greedySolutions = greedySolutions;
 
 		setNumberOfVariables(n * n * 2);
 		setNumberOfObjectives(2);
@@ -94,7 +95,12 @@ public class Regado extends AbstractIntegerProblem {
 
 	@Override
 	public IntegerSolution createSolution() {
-		return new CustomDefaultIntegerSolution(this.getVariableBounds(), this.getNumberOfObjectives(), this.greedySolution);
+		if (greedySolutions != null && indiceGreedySolution < greedySolutions.size()) {
+			int[][] greedySolution = greedySolutions.get(indiceGreedySolution);
+			indiceGreedySolution++;
+			return new CustomDefaultIntegerSolution(this.getVariableBounds(), this.getNumberOfObjectives(), greedySolution);
+		}
+		return new CustomDefaultIntegerSolution(this.getVariableBounds(), this.getNumberOfObjectives(), null);
 	}
 
 	@Override

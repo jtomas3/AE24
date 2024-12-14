@@ -7,19 +7,17 @@ import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 
 public class CustomDefaultIntegerSolution extends AbstractSolution<Integer> implements IntegerSolution {
     protected List<Pair<Integer, Integer>> bounds;
-    private static int amountOfGreedySolutions;
 
     // Constructor que permite inicializar con greedySolution
     public CustomDefaultIntegerSolution(List<Pair<Integer, Integer>> bounds, int numberOfObjectives, int numberOfConstraints, int[][] greedySolution) {
         super(bounds.size(), numberOfObjectives);
         this.bounds = bounds;
-        CustomDefaultIntegerSolution.amountOfGreedySolutions += 1;
 
         for (int i = 0; i < bounds.size(); ++i) {
             int greedyValue = extractGreedyValue(greedySolution, i);
             // Probabilidad de usar un valor aleatorio en lugar de greedySolution
             int mutationProbability = (int) (JMetalRandom.getInstance().nextDouble() * 100);
-            if ((greedyValue != -1 || mutationProbability < 30) && amountOfGreedySolutions < 4) {
+            if ((greedyValue != -1 || mutationProbability < 30)) {
                 // Usar el valor de greedySolution si está definido
                 this.setVariable(i, greedyValue);
             } else {
