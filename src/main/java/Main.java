@@ -2,6 +2,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Main {
 	public static void main(String[] args) {
@@ -22,8 +25,8 @@ public class Main {
 		int tamañoPoblacion = 50;
 
 		// Parametros
-		CalcularMaximos calculador = new CalcularMaximos(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
-				alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto);
+		CalcularMaximos calculador = new CalcularMaximos(n, informacionSuelos, informacionCultivos, cultivosCampo,
+				suelosCampo, alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto);
 		int costoMaximo = calculador.calcularCostoMaximo(n, costoTipo1, costoTipo2, costoTipo3);
 		double desbalanceMaximo = calculador.calcularDesbalanceMaximo(n, tiempoMaximo);
 
@@ -40,35 +43,55 @@ public class Main {
 
 		int opcion = scanner.nextInt();
 		switch (opcion) {
-			case 1:
-				System.out.println("Algoritmo Genético fue seleccionado...");
-				greedySolutions = null;
-				break;
+		case 1:
+			System.out.println("Algoritmo Genético fue seleccionado...");
+			greedySolutions = null;
+			break;
 
-			case 2:
-				System.out.println("Algoritmo Genetico empezando con solucion Greedy fue seleccionado...");
-				System.out.println("Tamaño de la población: "+ tamañoPoblacion);
-				// Tomar 4/5 de la población como soluciones Greedy. Castear a int para redondear hacia abajo.
-				int cantidadGreedySolutions = (int) Math.floor(tamañoPoblacion * 4.0 / 5.0);
-				System.out.println("Cantidad de soluciones Greedy a generar: "+ cantidadGreedySolutions);
-				for (int i = 0; i < cantidadGreedySolutions; i++) {
-					System.out.println("Greedy numero " + i++);
-					greedySolutions.add(new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
-							alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto).ejecutar());
-					System.out.println("-------------------");
-				}				
+		case 2:
+			System.out.println("Algoritmo Genetico empezando con solucion Greedy fue seleccionado...");
+			System.out.println("Tamaño de la población: " + tamañoPoblacion);
+			// Tomar 4/5 de la población como soluciones Greedy. Castear a int para
+			// redondear hacia abajo.
+			int cantidadGreedySolutions = (int) Math.floor(tamañoPoblacion * 4.0 / 5.0);
+			System.out.println("Cantidad de soluciones Greedy a generar: " + cantidadGreedySolutions);
 
-				break;
+			ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+			List<Future<int[][]>> futures = new ArrayList<>();
 
-			case 3:
-				System.out.println("Ejecutando Greedy...");
-				new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
-						alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto).ejecutar();
-				return;
+			for (int i = 0; i < cantidadGreedySolutions; i++) {
+				final int greedyIndex = i; // Variable final para usar en la lambda
+				futures.add(executor.submit(() -> {
+					System.out.println("Iniciando Greedy número " + greedyIndex);
+					return new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
+							alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto).ejecutar();
+				}));
+			}
 
-			default:
-				System.out.println("Opción inválida. Saliendo del programa.");
-				return;
+			// Recoger los resultados de las tareas
+			for (int i = 0; i < futures.size(); i++) {
+				try {
+					System.out.println("Obteniendo resultado de Greedy número " + i);
+					greedySolutions.add(futures.get(i).get());
+				} catch (Exception e) {
+					System.err.println("Error al ejecutar Greedy número " + i + ": " + e.getMessage());
+				}
+			}
+
+			// Cerrar el executor
+			executor.shutdown();
+			System.out.println("Generación de soluciones Greedy completada.");
+			break;
+
+		case 3:
+			System.out.println("Ejecutando Greedy...");
+			new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo, alpha, beta,
+					costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto).ejecutar();
+			return;
+
+		default:
+			System.out.println("Opción inválida. Saliendo del programa.");
+			return;
 		}
 
 		// Crear una instancia del problema
