@@ -102,7 +102,7 @@ public class RegadoRunner {
 
 	private IntegerSolution runAlgorithm(Regado problem, double maxObjective0, int maxObjective1) {
 		// Configuración de los operadores
-		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.5, 40.0);
+		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.5, 10.0);
 		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.03, 8.0);
 		SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(
 				new RankingAndCrowdingDistanceComparator<>());
@@ -252,6 +252,8 @@ public class RegadoRunner {
 
 				System.out.println("Objective 0 (Diferencia hídrica total): " + solution.getObjective(0));
 				System.out.println("Objective 1 (Costo): " + solution.getObjective(1));
+				exportarIrrigacionCSV(riegoTotal, "riegoTotal_"+counter+".csv");
+				exportarAspersoresCSV(solution, "aspersores_"+counter+".csv");
 			}
 		return bestSolution;
 	}
@@ -262,6 +264,38 @@ public class RegadoRunner {
 			writer.write("Objective 1,Objective 2\n");
 			for (IntegerSolution solution : bestSolutions) {
 				writer.write(solution.getObjective(0) + "," + solution.getObjective(1) + "\n");
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void exportarIrrigacionCSV(double[][] riegoTotal, String fileName) {
+		try {
+			FileWriter writer = new FileWriter(fileName);
+			for (int i = 0; i < riegoTotal.length; i++) {
+				for (int j = 0; j < riegoTotal[0].length; j++) {
+					writer.write(riegoTotal[i][j] + ",");
+				}
+				writer.write("\n");
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void exportarAspersoresCSV(IntegerSolution solution, String fileName) {
+		try {
+			FileWriter writer = new FileWriter(fileName);
+			int n = (int) Math.sqrt(solution.getNumberOfVariables() / 2);
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
+					int index = i * n + j;
+					writer.write(solution.getVariable(index) + ",");
+				}
+				writer.write("\n");
 			}
 			writer.close();
 		} catch (IOException e) {

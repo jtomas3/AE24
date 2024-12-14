@@ -79,7 +79,7 @@ public class Regado extends AbstractIntegerProblem {
 			if (i < getNumberOfVariables() / 2) {
 				// Tipos de aspersores
 				lowerLimit.add(0);
-				upperLimit.add(3);
+				upperLimit.add(2);
 			} else {
 				// Tiempos de riego en minuto
 				lowerLimit.add(0);
@@ -168,7 +168,7 @@ public class Regado extends AbstractIntegerProblem {
 				if (tipoAspersor != 0) {
 					int tiempoEncendido = solution.getVariable(index + n * n);
 					riegoTotal[i][j] += x * tiempoEncendido; // Riego en la parcela actual
-					if (tipoAspersor == 2 || tipoAspersor == 3) {
+					if (tipoAspersor == 1 || tipoAspersor == 2) {
 						// Riego en las parcelas adyacentes (a distancia 1)
 						if (i - 1 >= 0)
 							riegoTotal[i - 1][j] += x * alpha * tiempoEncendido;
@@ -179,7 +179,7 @@ public class Regado extends AbstractIntegerProblem {
 						if (j + 1 < n)
 							riegoTotal[i][j + 1] += x * alpha * tiempoEncendido;
 					}
-					if (tipoAspersor == 3) {
+					if (tipoAspersor == 2) {
 						// Riego en las parcelas (a distancia 2)
 						if (i - 2 >= 0)
 							riegoTotal[i - 2][j] += x * beta * tiempoEncendido;

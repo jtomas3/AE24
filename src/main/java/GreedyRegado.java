@@ -45,7 +45,7 @@ public class GreedyRegado {
 
         // Recorrer el campo, con combinaciones i,j random, probando todas solo una vez
         // Arreglo de tamaño n, con los digitos de 1..n en orden aleatorio
-        for (int z = 0; z < 2; z++) {
+        for (int z = 0; z < 3; z++) {
             int[] randomOrder = new int[n];
             for (int i = 0; i < n; i++) {
                 randomOrder[i] = i;
@@ -101,7 +101,7 @@ public class GreedyRegado {
         double mejorCosto = Double.MAX_VALUE;
 
         // Evaluar cada tipo de aspersor con tiempos de riego incrementales
-        for (int tipo = 0; tipo <= 3; tipo++) {
+        for (int tipo = 0; tipo <= 2; tipo++) {
             for (int tiempo = 1; tiempo <= 120; tiempo += 2) { // Incrementos de 5 minutos
                 double costo = calcularCosto(tipo);
                 configuracionAspersores[i][j] = tipo;
@@ -191,7 +191,7 @@ public class GreedyRegado {
           if (tipoAspersor != 0) {
             int tiempoEncendido = tiemposRiego[i][j];
             riegoTotal[i][j] += riegoPorMinuto * tiempoEncendido; // Riego en la parcela actual
-            if (tipoAspersor == 2 || tipoAspersor == 3) {
+            if (tipoAspersor == 1 || tipoAspersor == 2) {
               // Riego en las parcelas adyacentes (a distancia 1)
               if (i - 1 >= 0)
                 riegoTotal[i - 1][j] += riegoPorMinuto * alpha * tiempoEncendido;
@@ -202,7 +202,7 @@ public class GreedyRegado {
               if (j + 1 < n)
                 riegoTotal[i][j + 1] += riegoPorMinuto * alpha * tiempoEncendido;
             }
-            if (tipoAspersor == 3) {
+            if (tipoAspersor == 2) {
               // Riego en las parcelas (a distancia 2)
               if (i - 2 >= 0)
                 riegoTotal[i - 2][j] += riegoPorMinuto * beta * tiempoEncendido;

@@ -63,7 +63,7 @@ public class CalcularMaximos {
         // Inicializar configuracionAspersores todos con tipo 3, y tiemposRiego todo en tiempoMaximo para el peor caso
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                configuracionAspersores[i][j] = 3;
+                configuracionAspersores[i][j] = 2;
                 tiemposRiego[i][j] = tiempoMaximo;
             }
         }
@@ -132,7 +132,7 @@ public class CalcularMaximos {
                 if (tipoAspersor != 0) {
                     int tiempoEncendido = tiemposRiego[i][j];
                     riegoTotal[i][j] += riegoPorMinuto * tiempoEncendido; // Riego en la parcela actual
-                    if (tipoAspersor == 2 || tipoAspersor == 3) {
+                    if (tipoAspersor == 1 || tipoAspersor == 2) {
                         // Riego en las parcelas adyacentes (a distancia 1)
                         if (i - 1 >= 0)
                             riegoTotal[i - 1][j] += riegoPorMinuto * alpha * tiempoEncendido;
@@ -143,7 +143,7 @@ public class CalcularMaximos {
                         if (j + 1 < n)
                             riegoTotal[i][j + 1] += riegoPorMinuto * alpha * tiempoEncendido;
                     }
-                    if (tipoAspersor == 3) {
+                    if (tipoAspersor == 2) {
                         // Riego en las parcelas (a distancia 2)
                         if (i - 2 >= 0)
                             riegoTotal[i - 2][j] += riegoPorMinuto * beta * tiempoEncendido;

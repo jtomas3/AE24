@@ -10,8 +10,8 @@ public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
 		int n = 30;
-		double alpha = 0.7;
-		double beta = 0.3;
+		double alpha = 0.8;
+		double beta = 0.6;
 		int costoTipo1 = 1;
 		int costoTipo2 = 1;
 		int costoTipo3 = 1;
