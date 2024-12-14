@@ -107,7 +107,7 @@ public class RegadoRunner {
 				new RankingAndCrowdingDistanceComparator<>());
 
 		// Creación del algoritmo NSGA-II
-		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 2000000, 100, 70, 70, crossover,
+		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 2000000, 35, 30, 30, crossover,
 				mutation, selection, new SequentialSolutionListEvaluator<>());
 
 		System.out.println("Comenzando ejecución del algoritmo...");
@@ -128,6 +128,22 @@ public class RegadoRunner {
 				bestSolution = population.get(i);
 			}
 		}
+
+		// Encuentra soluciones que prioricen el objetivo 0 más que el objetivo 1
+		// List<IntegerSolution> prioritizedSolutions = new ArrayList<>();
+		// for (IntegerSolution solution : population) {
+		// 	// Calcula un score ponderado (puedes ajustar los pesos según necesites)
+		// 	double weightedScore = 0.7 * solution.getObjective(0) + 0.3 * solution.getObjective(1); // Normalizar
+		// 	solution.setAttribute("WeightedScore", weightedScore);
+		// 	prioritizedSolutions.add(solution);
+		// }
+
+		// // Ordena las soluciones por el score ponderado
+		// prioritizedSolutions.sort(Comparator.comparing(s -> (double) s.getAttribute("WeightedScore")));
+
+		// // Selecciona las dos mejores soluciones según el score ponderado
+		// IntegerSolution bestForObjective0More = prioritizedSolutions.get(0);
+		// IntegerSolution secondBestForObjective0More = prioritizedSolutions.get(1);
 
 		return bestSolution;
 	}
