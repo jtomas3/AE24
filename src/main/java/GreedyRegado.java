@@ -45,7 +45,7 @@ public class GreedyRegado {
 
         // Recorrer el campo, con combinaciones i,j random, probando todas solo una vez
         // Arreglo de tamaño n, con los digitos de 1..n en orden aleatorio
-        for (int z = 0; z < 2; z++) {
+        for (int z = 0; z < 5; z++) {
             int[] randomOrder = new int[n];
             for (int i = 0; i < n; i++) {
                 randomOrder[i] = i;

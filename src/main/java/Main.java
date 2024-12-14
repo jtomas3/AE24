@@ -4,7 +4,7 @@ import java.util.Scanner;
 public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
-		int n = 40;
+		int n = 10;
 		double alpha = 0.7;
 		double beta = 0.3;
 		int costoTipo1 = 10;

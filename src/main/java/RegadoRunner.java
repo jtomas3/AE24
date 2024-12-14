@@ -102,12 +102,12 @@ public class RegadoRunner {
 	private IntegerSolution runAlgorithm(Regado problem) {
 		// Configuración de los operadores
 		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.5, 20.0);
-		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.9, 8.0);
+		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.02, 8.0);
 		SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(
 				new RankingAndCrowdingDistanceComparator<>());
 
 		// Creación del algoritmo NSGA-II
-		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 2000000, 20, 20, 20, crossover,
+		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 2000000, 100, 70, 70, crossover,
 				mutation, selection, new SequentialSolutionListEvaluator<>());
 
 		System.out.println("Comenzando ejecución del algoritmo...");
