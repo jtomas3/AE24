@@ -102,7 +102,7 @@ public class RegadoRunner {
 	private IntegerSolution runAlgorithm(Regado problem) {
 		// Configuración de los operadores
 		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.5, 20.0);
-		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.01, 8.0);
+		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.9, 8.0);
 		SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(
 				new RankingAndCrowdingDistanceComparator<>());
 

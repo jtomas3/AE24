@@ -34,7 +34,8 @@ public class GreedyRegado {
         this.tiemposRiego = new int[n][n];
     }
 
-    public void ejecutar() {
+    public int[][] ejecutar() {
+
         // Recorrer el campo en orden
         // for (int i = 0; i < n; i++) {
         //     for (int j = 0; j < n; j++) {
@@ -44,7 +45,7 @@ public class GreedyRegado {
 
         // Recorrer el campo, con combinaciones i,j random, probando todas solo una vez
         // Arreglo de tamaño n, con los digitos de 1..n en orden aleatorio
-        for (int z = 0; z < 5; z++) {
+        for (int z = 0; z < 2; z++) {
             int[] randomOrder = new int[n];
             for (int i = 0; i < n; i++) {
                 randomOrder[i] = i;
@@ -80,6 +81,17 @@ public class GreedyRegado {
         }
 
         imprimirConfiguracion();
+
+        // Concatenar configuraciones
+        int[][] greedySolution = new int[2*n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                greedySolution[i][j] = configuracionAspersores[i][j];
+                greedySolution[i+n][j] = tiemposRiego[i][j];
+            }
+        }
+
+      return greedySolution;
     }
 
     private void seleccionarMejorConfiguracion(int i, int j) {

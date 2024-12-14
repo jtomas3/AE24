@@ -1,5 +1,6 @@
 import org.uma.jmetal.problem.integerproblem.impl.AbstractIntegerProblem;
 import org.uma.jmetal.solution.integersolution.IntegerSolution;
+import org.uma.jmetal.solution.integersolution.impl.DefaultIntegerSolution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,9 @@ public class Regado extends AbstractIntegerProblem {
 	private final double alpha;
 	private final double beta;
 
+	// Solucion dada por el algoritmo greedy. (Opcional)
+	private int[][] greedySolution;
+
 	// Mapa con key como tipo de suelo y value como un hash con keys:
 	// - "h_campo": Capacidad de campo
 	// - "h_marchitez": Punto de marchitez
@@ -50,7 +54,7 @@ public class Regado extends AbstractIntegerProblem {
 
 	public Regado(int n, Map<String, Map<String, Double>> informacionSuelos,
 			Map<String, Map<String, Double>> informacionCultivos, String[][] cultivosCampo, String[][] sueslosCampo,
-			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto) {
+			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto, int[][] greedySolution) {
 		this.n = n;
 		this.informacionSuelos = informacionSuelos;
 		this.informacionCultivos = informacionCultivos;
@@ -62,6 +66,7 @@ public class Regado extends AbstractIntegerProblem {
 		this.COSTO_TIPO_2 = costoTipo2;
 		this.COSTO_TIPO_3 = costoTipo3;
 		this.x = riegoPorMinuto;
+		this.greedySolution = greedySolution;
 
 		setNumberOfVariables(n * n * 2);
 		setNumberOfObjectives(2);
@@ -85,6 +90,11 @@ public class Regado extends AbstractIntegerProblem {
 		// no hay aspersor,
 		// y 1, 2 o 3 si hay un aspersor de tipo 1, 2 o 3 respectivamente.
 		setVariableBounds(lowerLimit, upperLimit);
+	}
+
+	@Override
+	public IntegerSolution createSolution() {
+		return new CustomDefaultIntegerSolution(this.getVariableBounds(), this.getNumberOfObjectives(), this.greedySolution);
 	}
 
 	@Override
