@@ -105,7 +105,7 @@ public class GreedyRegado {
 
       // Probabilidad de añadir un aspersor disminuye según el número de aspersores adyacentes
       double probabilidadBase = 1; // Probabilidad base de colocar un aspersor si no hay adyacentes
-      double probabilidad = probabilidadBase * Math.pow(0.75, aspersoresAdyacentes); // Reduce por cada aspersor adyacente
+      double probabilidad = probabilidadBase * Math.pow(0.5, aspersoresAdyacentes); // Reduce por cada aspersor adyacente
 
       // Evaluar cada tipo de aspersor con tiempos de riego incrementales
       for (int tipo = 0; tipo <= 2; tipo++) {

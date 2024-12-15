@@ -114,10 +114,10 @@ public class Regado extends AbstractIntegerProblem {
 		for (int i = 0; i < solution.getNumberOfVariables() / 2; i++) {
 			int tipoAspersor = solution.getVariable(i);
 
-			// Si no hay aspersores en los alrededores, se coloca un aspersor tipo 1 con probabilidad 3%
+			// Si no hay aspersores en los alrededores, se coloca un aspersor tipo 1 con probabilidad 4%
 			int random = (int) (Math.random() * 100);
 			// Heuristica: Se checkea que no se trate del caso donde no hay aspersores en un 3x3.
-			if (tipoAspersor == 0 && random < 3) {
+			if (tipoAspersor == 0 && random < 4) {
 				// Convertir índice lineal a coordenadas 2D
 				int row = i / n;
 				int col = i % n;
