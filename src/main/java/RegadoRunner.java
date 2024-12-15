@@ -102,13 +102,13 @@ public class RegadoRunner {
 
 	private IntegerSolution runAlgorithm(Regado problem, double maxObjective0, int maxObjective1) {
 		// Configuración de los operadores
-		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.5, 10.0);
+		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.6, 30);
 		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.03, 8.0);
 		SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(
 				new RankingAndCrowdingDistanceComparator<>());
 
 		// Creación del algoritmo NSGA-II
-		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 2000000, 50, 30, 30, crossover,
+		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 1000000, 70, 50, 40, crossover,
 				mutation, selection, new SequentialSolutionListEvaluator<>());
 
 		System.out.println("Comenzando ejecución del algoritmo...");
@@ -179,7 +179,8 @@ public class RegadoRunner {
 			System.out.println("Normalized Objective 0: " + normalizedObjective0);
 			System.out.println("Normalized Objective 1: " + normalizedObjective1);
 			System.out.println(" ");
-			double weightedScore = 0.95 * normalizedObjective0 + 0.05 * normalizedObjective1; // Normalizar
+			// Fitness ponderado
+			double weightedScore = 0.8 * normalizedObjective0 + 0.2 * normalizedObjective1; // Normalizar
 			solution.setAttribute("WeightedScore", weightedScore);
 			prioritizedSolutions.add(solution);
 		}

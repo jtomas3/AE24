@@ -43,9 +43,11 @@ public class GreedyRegado {
         //    }
         // }
 
+        // Elegir la cantidad de iteraciones del greedy entre 1 y 3
+        int randomNumber = (int) (Math.random() * 3) + 1;
         // Recorrer el campo, con combinaciones i,j random, probando todas solo una vez
         // Arreglo de tamaño n, con los digitos de 1..n en orden aleatorio
-        for (int z = 0; z < 3; z++) {
+        for (int z = 0; z < randomNumber; z++) {
             int[] randomOrder = new int[n];
             for (int i = 0; i < n; i++) {
                 randomOrder[i] = i;
@@ -94,33 +96,57 @@ public class GreedyRegado {
       return greedySolution;
     }
 
-    private void seleccionarMejorConfiguracion(int i, int j) {
-        double mejorDesviacion = Double.MAX_VALUE;
-        int mejorTipo = 0;
-        int mejorTiempo = 0;
-        double mejorCosto = Double.MAX_VALUE;
+  private void seleccionarMejorConfiguracion(int i, int j) {
+      double mejorDesviacion = Double.MAX_VALUE;
+      int mejorTipo = 0;
+      int mejorTiempo = 0;
+      double mejorCosto = Double.MAX_VALUE;
+      int aspersoresAdyacentes = contarAspersoresAdyacentes(i, j);
 
-        // Evaluar cada tipo de aspersor con tiempos de riego incrementales
-        for (int tipo = 0; tipo <= 2; tipo++) {
-            for (int tiempo = 1; tiempo <= 120; tiempo += 2) { // Incrementos de 5 minutos
-                double costo = calcularCosto(tipo);
-                configuracionAspersores[i][j] = tipo;
-                tiemposRiego[i][j] = tiempo;
-                double[][] riegoTotal = calcularRiegoTotalCampo(configuracionAspersores, tiemposRiego);
-                double desviacion = calcularDesviacionHidrica(riegoTotal);
+      // Probabilidad de añadir un aspersor disminuye según el número de aspersores adyacentes
+      double probabilidadBase = 1; // Probabilidad base de colocar un aspersor si no hay adyacentes
+      double probabilidad = probabilidadBase * Math.pow(0.75, aspersoresAdyacentes); // Reduce por cada aspersor adyacente
 
-                // Seleccionar la configuración con menor desviación hídrica
-                if (desviacion < mejorDesviacion || (desviacion == mejorDesviacion && costo < mejorCosto)) {
-                    mejorDesviacion = desviacion;
-                    mejorTipo = tipo;
-                    mejorTiempo = tiempo;
-                    mejorCosto = costo;
+      // Evaluar cada tipo de aspersor con tiempos de riego incrementales
+      for (int tipo = 0; tipo <= 2; tipo++) {
+          for (int tiempo = 1; tiempo <= 60; tiempo += 2) { // Incrementos de 2
+              double costo = calcularCosto(tipo);
+              configuracionAspersores[i][j] = tipo;
+              tiemposRiego[i][j] = tiempo;
+              double[][] riegoTotal = calcularRiegoTotalCampo(configuracionAspersores, tiemposRiego);
+              double desviacion = calcularDesviacionHidrica(riegoTotal);
+
+              // Seleccionar la configuración con menor desviación hídrica
+              if (desviacion < mejorDesviacion || (desviacion == mejorDesviacion && costo < mejorCosto)) {
+                  if (Math.random() < probabilidad) { // Solo actualizar si supera la prueba probabilística
+                      mejorDesviacion = desviacion;
+                      mejorTipo = tipo;
+                      mejorTiempo = tiempo;
+                      mejorCosto = costo;
+                  }
+              }
+          }
+      }
+
+      configuracionAspersores[i][j] = mejorTipo;
+      tiemposRiego[i][j] = mejorTiempo;
+  }
+
+    private int contarAspersoresAdyacentes(int i, int j) {
+        int count = 0;
+        for (int di = -1; di <= 1; di++) {
+            for (int dj = -1; dj <= 1; dj++) {
+                if (di == 0 && dj == 0) continue; // Saltar la propia parcela
+                int ni = i + di;
+                int nj = j + dj;
+                if (ni >= 0 && ni < n && nj >= 0 && nj < n) { // Asegurarse de que no se salga de los límites
+                    if (configuracionAspersores[ni][nj] > 0) { // Verificar si hay aspersor
+                        count++;
+                    }
                 }
             }
         }
-
-        configuracionAspersores[i][j] = mejorTipo;
-        tiemposRiego[i][j] = mejorTiempo;
+        return count;
     }
 
     private double calcularCosto(int tipo) {

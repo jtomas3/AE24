@@ -22,7 +22,7 @@ public class Main {
 		String[][] suelosCampo = GeneracionDatos.obtenerSuelosCampo(n);
 		// TODO: Pasarlo como parametro a Regado.java (está duplicado)
 		int tiempoMaximo = 60;
-		int tamañoPoblacion = 50;
+		int tamañoPoblacion = 70;
 
 		// Parametros
 		CalcularMaximos calculador = new CalcularMaximos(n, informacionSuelos, informacionCultivos, cultivosCampo,

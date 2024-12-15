@@ -114,6 +114,38 @@ public class Regado extends AbstractIntegerProblem {
 		for (int i = 0; i < solution.getNumberOfVariables() / 2; i++) {
 			int tipoAspersor = solution.getVariable(i);
 
+			// Si no hay aspersores en los alrededores, se coloca un aspersor tipo 1 con probabilidad 3%
+			int random = (int) (Math.random() * 100);
+			// Heuristica: Se checkea que no se trate del caso donde no hay aspersores en un 3x3.
+			if (tipoAspersor == 0 && random < 3) {
+				// Convertir índice lineal a coordenadas 2D
+				int row = i / n;
+				int col = i % n;
+				boolean foundAspersor = false;
+				for (int dRow = -1; dRow <= 1; dRow++) {
+							for (int dCol = -1; dCol <= 1; dCol++) {
+									if (dRow == 0 && dCol == 0) continue; // Saltar la parcela actual
+									int neighborRow = row + dRow;
+									int neighborCol = col + dCol;
+									if (neighborRow >= 0 && neighborRow < n && neighborCol >= 0 && neighborCol < n) {
+											int neighborIndex = neighborRow * n + neighborCol;
+											if (solution.getVariable(neighborIndex) > 0) {
+													foundAspersor = true;
+													break;
+											}
+									}
+							}
+							if (foundAspersor) break;
+				}
+
+				if (!foundAspersor) {
+					// Colocar un aspersor tipo 2 en la parcela actual si no hay en los alrededores
+					solution.setVariable(i, 2);
+					solution.setVariable(i + n * n, 20); // Establecer tiempo de riego a 10 minutos default
+					tipoAspersor = 1; // Actualizar el tipo de aspersor para continuar con la evaluación
+				}
+			}
+
 			costoTotal += calcularCosto(tipoAspersor); // Calcula el costo basado en el tipo
 			totalDiferenciaHidrica += calcularDesviacionHidricaParcela(solution, i, riegoTotal); // Calcula la
 																									// desviación
