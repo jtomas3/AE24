@@ -83,7 +83,7 @@ public class Regado extends AbstractIntegerProblem {
 			} else {
 				// Tiempos de riego en minuto
 				lowerLimit.add(0);
-				upperLimit.add(60);
+				upperLimit.add(20);
 			}
 		}
 
@@ -113,6 +113,38 @@ public class Regado extends AbstractIntegerProblem {
 		// son consecuencia
 		for (int i = 0; i < solution.getNumberOfVariables() / 2; i++) {
 			int tipoAspersor = solution.getVariable(i);
+
+			// Si no hay aspersores en los alrededores, se coloca un aspersor tipo 1 con probabilidad 4%
+			int random = (int) (Math.random() * 100);
+			// Heuristica: Se checkea que no se trate del caso donde no hay aspersores en un 3x3.
+			if (tipoAspersor == 0 && random < 6) {
+				// Convertir índice lineal a coordenadas 2D
+				int row = i / n;
+				int col = i % n;
+				boolean foundAspersor = false;
+				for (int dRow = -1; dRow <= 1; dRow++) {
+							for (int dCol = -1; dCol <= 1; dCol++) {
+									if (dRow == 0 && dCol == 0) continue; // Saltar la parcela actual
+									int neighborRow = row + dRow;
+									int neighborCol = col + dCol;
+									if (neighborRow >= 0 && neighborRow < n && neighborCol >= 0 && neighborCol < n) {
+											int neighborIndex = neighborRow * n + neighborCol;
+											if (solution.getVariable(neighborIndex) > 0) {
+													foundAspersor = true;
+													break;
+											}
+									}
+							}
+							if (foundAspersor) break;
+				}
+
+				if (!foundAspersor) {
+					// Colocar un aspersor tipo 2 en la parcela actual si no hay en los alrededores
+					solution.setVariable(i, 2);
+					solution.setVariable(i + n * n, 10); // Establecer tiempo de riego a 10 default
+					tipoAspersor = 1; // Actualizar el tipo de aspersor para continuar con la evaluación
+				}
+			}
 
 			costoTotal += calcularCosto(tipoAspersor); // Calcula el costo basado en el tipo
 			totalDiferenciaHidrica += calcularDesviacionHidricaParcela(solution, i, riegoTotal); // Calcula la
@@ -181,14 +213,14 @@ public class Regado extends AbstractIntegerProblem {
 					}
 					if (tipoAspersor == 2) {
 						// Riego en las parcelas (a distancia 2)
-						if (i - 2 >= 0)
-							riegoTotal[i - 2][j] += x * beta * tiempoEncendido;
-						if (i + 2 < n)
-							riegoTotal[i + 2][j] += x * beta * tiempoEncendido;
-						if (j - 2 >= 0)
-							riegoTotal[i][j - 2] += x * beta * tiempoEncendido;
-						if (j + 2 < n)
-							riegoTotal[i][j + 2] += x * beta * tiempoEncendido;
+						 if (i - 2 >= 0)
+						 	riegoTotal[i - 2][j] += x * beta * tiempoEncendido;
+						 if (i + 2 < n)
+						 	riegoTotal[i + 2][j] += x * beta * tiempoEncendido;
+						 if (j - 2 >= 0)
+						 	riegoTotal[i][j - 2] += x * beta * tiempoEncendido;
+						 if (j + 2 < n)
+						 	riegoTotal[i][j + 2] += x * beta * tiempoEncendido;
 						// Diagonales
 						if (i - 1 >= 0 && j - 1 >= 0)
 							riegoTotal[i - 1][j - 1] += x * beta * tiempoEncendido;

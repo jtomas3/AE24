@@ -10,18 +10,18 @@ public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
 		int n = 30;
-		double alpha = 0.8;
-		double beta = 0.6;
+		double alpha = 0.9;
+		double beta = 0.8;
 		int costoTipo1 = 1;
 		int costoTipo2 = 1;
 		int costoTipo3 = 1;
-		int riegoPorMinuto = 10;
+		int riegoPorMinuto = 20;
 		Map<String, Map<String, Double>> informacionSuelos = GeneracionDatos.obtenerInformacionSuelos();
 		Map<String, Map<String, Double>> informacionCultivos = GeneracionDatos.obtenerInformacionCultivos();
 		String[][] cultivosCampo = GeneracionDatos.obtenerCultivosCampo(n);
 		String[][] suelosCampo = GeneracionDatos.obtenerSuelosCampo(n);
 		// TODO: Pasarlo como parametro a Regado.java (está duplicado)
-		int tiempoMaximo = 60;
+		int tiempoMaximo = 30;
 		int tamañoPoblacion = 50;
 
 		// Parametros
@@ -53,7 +53,7 @@ public class Main {
 			System.out.println("Tamaño de la población: " + tamañoPoblacion);
 			// Tomar 4/5 de la población como soluciones Greedy. Castear a int para
 			// redondear hacia abajo.
-			int cantidadGreedySolutions = (int) Math.floor(tamañoPoblacion * 4.0 / 5.0);
+			int cantidadGreedySolutions = (int) Math.floor(tamañoPoblacion * 4 / 5.0);
 			System.out.println("Cantidad de soluciones Greedy a generar: " + cantidadGreedySolutions);
 
 			ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
