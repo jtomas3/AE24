@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
 public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
-		int n = 30;
+		int n = 20;
 		double alpha = 0.9;
 		double beta = 0.8;
 		int costoTipo1 = 1;
