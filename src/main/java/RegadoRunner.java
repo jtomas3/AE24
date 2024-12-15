@@ -19,8 +19,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class RegadoRunner {
-	public void runAlgorithmOnce(Regado problem, double maxObjective0, int maxObjective1) {
-		List<IntegerSolution> bestSolutions = runAlgorithm(problem, maxObjective0, maxObjective1);
+	public void runAlgorithmOnce(Regado problem, double maxObjective0, int maxObjective1, int populationSize, int matingPoolSize, int offspringSize) {
+		List<IntegerSolution> bestSolutions = runAlgorithm(problem, maxObjective0, maxObjective1, populationSize, matingPoolSize, offspringSize);
 
 		int counter = 0;
 		for (IntegerSolution solution : bestSolutions) {
@@ -74,14 +74,14 @@ public class RegadoRunner {
 		}
 	}
 
-	public void runMultipleExecutions(Regado problem, int numExecutions, double maxObjective0, int maxObjective1) {
+	public void runMultipleExecutions(Regado problem, int numExecutions, double maxObjective0, int maxObjective1, int populationSize, int matingPoolSize, int offspringSize) {
 		List<List<IntegerSolution>> bestSolutions = new ArrayList<>();
 		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<Callable<List<IntegerSolution>>> tasks = new ArrayList<>();
 
 		for (int i = 0; i < numExecutions; i++) {
 			// Crear una tarea para cada ejecución
-			tasks.add(() -> runAlgorithm(problem, maxObjective0, maxObjective1));
+			tasks.add(() -> runAlgorithm(problem, maxObjective0, maxObjective1, populationSize, matingPoolSize, offspringSize));
 		}
 
 		try {
@@ -118,7 +118,7 @@ public class RegadoRunner {
 		exportBestSolutionsToCSV(weighted2, "weighted2.csv");
 	}
 
-	private List<IntegerSolution> runAlgorithm(Regado problem, double maxObjective0, int maxObjective1) {
+	private List<IntegerSolution> runAlgorithm(Regado problem, double maxObjective0, int maxObjective1, int populationSize, int matingPoolSize, int offspringSize) {
 		// Configuración de los operadores
 		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.6, 30);
 		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.03, 8.0);
@@ -126,7 +126,7 @@ public class RegadoRunner {
 				new RankingAndCrowdingDistanceComparator<>());
 
 		// Creación del algoritmo NSGA-II
-		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 1000000, 50, 40, 35, crossover, mutation,
+		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 1000000, populationSize, matingPoolSize, offspringSize, crossover, mutation,
 				selection, new SequentialSolutionListEvaluator<>());
 
 		System.out.println("Comenzando ejecución del algoritmo...");

@@ -55,7 +55,7 @@ public class Regado extends AbstractIntegerProblem {
 
 	public Regado(int n, Map<String, Map<String, Double>> informacionSuelos,
 			Map<String, Map<String, Double>> informacionCultivos, String[][] cultivosCampo, String[][] sueslosCampo,
-			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto, List<int[][]> greedySolutions) {
+			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto, List<int[][]> greedySolutions, int tiempoMaximo) {
 		this.n = n;
 		this.informacionSuelos = informacionSuelos;
 		this.informacionCultivos = informacionCultivos;
@@ -83,7 +83,7 @@ public class Regado extends AbstractIntegerProblem {
 			} else {
 				// Tiempos de riego en minuto
 				lowerLimit.add(0);
-				upperLimit.add(20);
+				upperLimit.add(tiempoMaximo);
 			}
 		}
 

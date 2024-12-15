@@ -9,20 +9,21 @@ import java.util.concurrent.Future;
 public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
-		int n = 20;
+		int n = 10;
 		double alpha = 0.9;
 		double beta = 0.8;
 		int costoTipo1 = 1;
 		int costoTipo2 = 1;
 		int costoTipo3 = 1;
 		int riegoPorMinuto = 20;
+		int tiempoMaximo = 30;
+		int tamañoPoblacion = 50;
+		int matingPoolSize = 40;
+		int offspringPopulationSize = 35;
 		Map<String, Map<String, Double>> informacionSuelos = GeneracionDatos.obtenerInformacionSuelos();
 		Map<String, Map<String, Double>> informacionCultivos = GeneracionDatos.obtenerInformacionCultivos();
 		String[][] cultivosCampo = GeneracionDatos.obtenerCultivosCampo(n);
 		String[][] suelosCampo = GeneracionDatos.obtenerSuelosCampo(n);
-		// TODO: Pasarlo como parametro a Regado.java (está duplicado)
-		int tiempoMaximo = 30;
-		int tamañoPoblacion = 50;
 
 		// Parametros
 		CalcularMaximos calculador = new CalcularMaximos(n, informacionSuelos, informacionCultivos, cultivosCampo,
@@ -96,7 +97,7 @@ public class Main {
 
 		// Crear una instancia del problema
 		Regado problema = new Regado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo, alpha, beta,
-				costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto, greedySolutions);
+				costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto, greedySolutions, tiempoMaximo);
 
 		RegadoRunner runner = new RegadoRunner();
 
@@ -108,13 +109,15 @@ public class Main {
 		switch (opcion2) {
 		case 1:
 			System.out.println("Ejecutando el algoritmo una vez...");
-			runner.runAlgorithmOnce(problema, desbalanceMaximo, costoMaximo);
+			runner.runAlgorithmOnce(problema, desbalanceMaximo, costoMaximo, tamañoPoblacion, matingPoolSize,
+					offspringPopulationSize);
 			break;
 
 		case 2:
 			System.out.println("Ingrese el número de ejecuciones:");
 			int numEjecuciones = scanner.nextInt();
-			runner.runMultipleExecutions(problema, numEjecuciones, desbalanceMaximo, costoMaximo);
+			runner.runMultipleExecutions(problema, numEjecuciones, desbalanceMaximo, costoMaximo, tamañoPoblacion,
+					matingPoolSize, offspringPopulationSize);
 			break;
 
 		default:
