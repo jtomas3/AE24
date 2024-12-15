@@ -102,8 +102,8 @@ public class RegadoRunner {
 
 	private IntegerSolution runAlgorithm(Regado problem, double maxObjective0, int maxObjective1) {
 		// Configuración de los operadores
-		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.6, 30);
-		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.03, 8.0);
+		CrossoverOperator<IntegerSolution> crossover = new IntegerSBXCrossover(0.5, 40);
+		MutationOperator<IntegerSolution> mutation = new IntegerPolynomialMutation(0.06, 8.0);
 		SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(
 				new RankingAndCrowdingDistanceComparator<>());
 
@@ -170,7 +170,7 @@ public class RegadoRunner {
 			// double normalizedObjective0 = (maxObjective0 - solution.getObjective(0)) / (maxObjective0 - 0); // Normalizar
 			// double normalizedObjective1 = (maxObjective1 - solution.getObjective(1)) / (maxObjective1 - 0); // Normalizar
 			// Normalizar los objetivos usando la media y desviación estándar, con valor absoluto
-			double normalizedObjective0 = Math.abs((solution.getObjective(0) - (avgObjective0 / 2)) / stdDevObjective0);
+			double normalizedObjective0 = Math.abs((solution.getObjective(0) - (avgObjective0) / 3) / stdDevObjective0);
 			double normalizedObjective1 = Math.abs((solution.getObjective(1) - avgObjective1) / stdDevObjective1);
 			System.out.println("Objective 0: " + solution.getObjective(0));
 			System.out.println("Objective 1: " + solution.getObjective(1));
@@ -253,10 +253,25 @@ public class RegadoRunner {
 
 				System.out.println("Objective 0 (Diferencia hídrica total): " + solution.getObjective(0));
 				System.out.println("Objective 1 (Costo): " + solution.getObjective(1));
+				System.out.println("Cantidad de aspersores: " + contarAspersores(solution));
 				exportarIrrigacionCSV(riegoTotal, "riegoTotal_"+counter+".csv");
 				exportarAspersoresCSV(solution, "aspersores_"+counter+".csv");
 			}
 		return bestSolution;
+	}
+
+	private static int contarAspersores(IntegerSolution solution) {
+		int n = (int) Math.sqrt(solution.getNumberOfVariables() / 2);
+		int aspersores = 0;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				int index = i * n + j;
+				if (solution.getVariable(index) != 0) {
+					aspersores++;
+				}
+			}
+		}
+		return aspersores;
 	}
 
 	private static void exportBestSolutionsToCSV(List<IntegerSolution> bestSolutions, String fileName) {

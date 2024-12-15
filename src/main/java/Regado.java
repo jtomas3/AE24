@@ -83,7 +83,7 @@ public class Regado extends AbstractIntegerProblem {
 			} else {
 				// Tiempos de riego en minuto
 				lowerLimit.add(0);
-				upperLimit.add(20);
+				upperLimit.add(12);
 			}
 		}
 
@@ -113,14 +113,13 @@ public class Regado extends AbstractIntegerProblem {
 		// son consecuencia
 		for (int i = 0; i < solution.getNumberOfVariables() / 2; i++) {
 			int tipoAspersor = solution.getVariable(i);
-
+			int row = i / n;
+			int col = i % n;
 			// Si no hay aspersores en los alrededores, se coloca un aspersor tipo 1 con probabilidad 4%
 			int random = (int) (Math.random() * 100);
 			// Heuristica: Se checkea que no se trate del caso donde no hay aspersores en un 3x3.
-			if (tipoAspersor == 0 && random < 6) {
+			if (tipoAspersor == 0 && random < 4) {
 				// Convertir índice lineal a coordenadas 2D
-				int row = i / n;
-				int col = i % n;
 				boolean foundAspersor = false;
 				for (int dRow = -1; dRow <= 1; dRow++) {
 							for (int dCol = -1; dCol <= 1; dCol++) {
@@ -140,13 +139,13 @@ public class Regado extends AbstractIntegerProblem {
 
 				if (!foundAspersor) {
 					// Colocar un aspersor tipo 2 en la parcela actual si no hay en los alrededores
-					solution.setVariable(i, 2);
+					solution.setVariable(i, 1);
 					solution.setVariable(i + n * n, 10); // Establecer tiempo de riego a 10 default
 					tipoAspersor = 1; // Actualizar el tipo de aspersor para continuar con la evaluación
 				}
 			}
 
-			costoTotal += calcularCosto(tipoAspersor); // Calcula el costo basado en el tipo
+			costoTotal += calcularCosto(tipoAspersor, solution.getVariable(i + n * n), row, col); // Calcula el costo total, con el tiempo
 			totalDiferenciaHidrica += calcularDesviacionHidricaParcela(solution, i, riegoTotal); // Calcula la
 																									// desviación
 																									// hidrica
@@ -172,17 +171,30 @@ public class Regado extends AbstractIntegerProblem {
 		solution.setObjective(1, costoTotal);
 	}
 
-	private int calcularCosto(int tipoAspersor) {
+	private int calcularCosto(int tipoAspersor, int tiempoEncendido, int i, int j) {
+		int costo = 0;
 		switch (tipoAspersor) {
 		case 1:
-			return COSTO_TIPO_1;
+			costo = COSTO_TIPO_1;
+			break;
 		case 2:
-			return COSTO_TIPO_2;
+			costo = COSTO_TIPO_2;
+			break;
 		case 3:
-			return COSTO_TIPO_3;
-		default:
-			return 0;
+			costo = COSTO_TIPO_3;
+			break;
 		}
+
+		if (tiempoEncendido < 4 && costo != 0) {
+			costo += (5 - tiempoEncendido) / 2;
+		}
+
+		// Penalizar aspersores en bordes del campo
+		if (i == 0 || i == n - 1 || j == 0 || j == n - 1 && costo != 0) {
+			costo += 4;
+		}
+
+		return costo;
 	}
 
 	double[][] calcularRiegoTotalCampo(IntegerSolution solution) {
@@ -253,18 +265,25 @@ public class Regado extends AbstractIntegerProblem {
 		double puntoMarchitez = informacionSuelos.get(tipoSuelo).get("h_marchitez");
 		double aguaReal = riegoTotal[indice_i_parcela][indice_j_parcela];
 
-		// Calcular cantidad de agua optima
+		// Calcular cantidad de agua óptima
 		double aguaOptima = capacidadCampo - puntoMarchitez + aguaRequerida;
 
-		// Calcular desviación hídrica y elevar segun la tolerancia
+		// Calcular la proporción del agua actual respecto a la óptima
+		double proporcionAgua = aguaReal / aguaOptima;
+
+		// Calcular desviación hídrica ajustada por la proporción del agua
 		if (aguaReal > aguaOptima) {
-			desviacionTotal += Math.pow(aguaReal - aguaOptima, toleranciaSobre);
+			// La penalización se reduce si la parcela tiene más agua de lo necesario
+			desviacionTotal += Math.pow((aguaReal - aguaOptima) / aguaOptima, toleranciaSobre) * proporcionAgua;
 		} else {
-			desviacionTotal += Math.pow(aguaOptima - aguaReal, toleranciaInfra);
+			// La penalización se reduce si la parcela tiene menos agua de lo necesario
+			desviacionTotal += Math.pow((aguaOptima - aguaReal) / aguaOptima, toleranciaInfra) * (1.0 - proporcionAgua);
 		}
 
 		return desviacionTotal;
 	}
+
+
 
 	// Igual que la funcion calcularDesviacionHidricaParcela pero esta solo se usa
 	// para imprimir la tabla final, mostrando donde
