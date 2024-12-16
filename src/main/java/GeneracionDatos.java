@@ -41,20 +41,20 @@ public class GeneracionDatos {
 
 		Map<String, Double> tipoCultivo2 = new HashMap<>();
 		tipoCultivo2.put("agua_requerida", 300.0);
-		tipoCultivo2.put("tolerancia_sobre", 1.5);
-		tipoCultivo2.put("tolerancia_infra", 0.8);
+		tipoCultivo2.put("tolerancia_sobre", 1.0);
+		tipoCultivo2.put("tolerancia_infra", 1.0);
 		informacionCultivos.put("cultivo2", tipoCultivo2);
 
 		Map<String, Double> tipoCultivo3 = new HashMap<>();
 		tipoCultivo3.put("agua_requerida", 200.0);
-		tipoCultivo3.put("tolerancia_sobre", 1.2);
-		tipoCultivo3.put("tolerancia_infra", 1.1);
+		tipoCultivo3.put("tolerancia_sobre", 1.0);
+		tipoCultivo3.put("tolerancia_infra", 1.0);
 		informacionCultivos.put("cultivo3", tipoCultivo3);
 
 		Map<String, Double> tipoCultivo4 = new HashMap<>();
 		tipoCultivo4.put("agua_requerida", 150.0);
-		tipoCultivo4.put("tolerancia_sobre", 1.3);
-		tipoCultivo4.put("tolerancia_infra", 1.2);
+		tipoCultivo4.put("tolerancia_sobre", 1.0);
+		tipoCultivo4.put("tolerancia_infra", 1.0);
 		informacionCultivos.put("cultivo4", tipoCultivo4);
 
 		return informacionCultivos;

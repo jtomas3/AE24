@@ -15,7 +15,7 @@ public class Main {
 		int costoTipo1 = 1;
 		int costoTipo2 = 1;
 		int costoTipo3 = 1;
-		int riegoPorMinuto = 20;
+		int riegoPorMinuto = 10;
 		int tiempoMaximo = 30;
 		int tamañoPoblacion = 50;
 		int matingPoolSize = 40;

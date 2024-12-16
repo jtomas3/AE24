@@ -105,12 +105,12 @@ public class GreedyRegado {
 
       // Probabilidad de añadir un aspersor disminuye según el número de aspersores adyacentes
       double probabilidadBase = 1; // Probabilidad base de colocar un aspersor si no hay adyacentes
-      double probabilidad = probabilidadBase * Math.pow(0.6, aspersoresAdyacentes); // Reduce por cada aspersor adyacente
+      double probabilidad = probabilidadBase * Math.pow(0.55, aspersoresAdyacentes); // Reduce por cada aspersor adyacente
       boolean yaTieneAspersor = configuracionAspersores[i][j] > 0;
       // Evaluar cada tipo de aspersor con tiempos de riego incrementales
       for (int tipo = 0; tipo <= 2; tipo++) {
-          for (int tiempo = 1; tiempo <= 30; tiempo += 1) { // Incrementos de 2
-              double costo = calcularCosto(tipo);
+          for (int tiempo = 4; tiempo <= 30; tiempo += 1) { // Incrementos de 2
+              double costo = calcularCosto(tipo, tiempo, i, j);
               configuracionAspersores[i][j] = tipo;
               tiemposRiego[i][j] = tiempo;
               double[][] riegoTotal = calcularRiegoTotalCampo(configuracionAspersores, tiemposRiego);
@@ -149,18 +149,30 @@ public class GreedyRegado {
         return count;
     }
 
-    private double calcularCosto(int tipo) {
-        // Implementar lógica de costo basada en tipo de aspersor y tiempo de riego
-        switch (tipo) {
+    private int calcularCosto(int tipoAspersor, int tiempoEncendido, int i, int j) {
+        int costo = 0;
+        switch (tipoAspersor) {
             case 1:
-                return costoTipo1;
+                costo = costoTipo1;
+                break;
             case 2:
-                return costoTipo2;
+                costo = costoTipo2;
+                break;
             case 3:
-                return costoTipo3;
-            default:
-                return 0;
+                costo = costoTipo3;
+                break;
         }
+
+        if (tiempoEncendido < 9 && costo != 0) {
+            costo += (10 - tiempoEncendido);
+        }
+
+        // Penalizar aspersores en bordes del campo
+        if (i == 0 || i == n - 1 || j == 0 || j == n - 1 && costo != 0) {
+            costo += 2;
+        }
+
+        return costo;
     }
 
     private double calcularDesviacionHidrica(double[][] riegoTotal) {
@@ -193,11 +205,19 @@ public class GreedyRegado {
       // Calcular cantidad de agua optima
       double aguaOptima = capacidadCampo - puntoMarchitez + aguaRequerida;
 
-      // Calcular desviación hídrica y elevar segun la tolerancia
+      double proporcionAgua;
+
+      // Calcular desviación hídrica ajustada por la proporción del agua
       if (aguaReal > aguaOptima) {
-          desviacionTotal += Math.pow(aguaReal - aguaOptima, toleranciaSobre);
+          proporcionAgua = aguaReal / aguaOptima;
+          desviacionTotal += Math.pow((aguaReal - aguaOptima) / aguaOptima, toleranciaSobre) * proporcionAgua;
       } else {
-          desviacionTotal += Math.pow(aguaOptima - aguaReal, toleranciaInfra);
+          if (aguaReal == 0) {
+              proporcionAgua = 10;
+          } else {
+              proporcionAgua = aguaOptima / aguaReal;
+          }
+          desviacionTotal += Math.pow((aguaOptima - aguaReal) / aguaOptima, toleranciaInfra) * proporcionAgua;
       }
 
       return desviacionTotal;
@@ -259,7 +279,7 @@ public class GreedyRegado {
         double costoTotal = 0.0;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                costoTotal += calcularCosto(configuracionAspersores[i][j]);
+                costoTotal += calcularCosto(configuracionAspersores[i][j], tiemposRiego[i][j], i, j);
             }
         }
         System.out.println("Costo total: " + costoTotal);
