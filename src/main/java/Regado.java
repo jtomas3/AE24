@@ -82,8 +82,8 @@ public class Regado extends AbstractIntegerProblem {
 				upperLimit.add(2);
 			} else {
 				// Tiempos de riego en minuto
-				lowerLimit.add(0);
-				upperLimit.add(12);
+				lowerLimit.add(4);
+				upperLimit.add(30);
 			}
 		}
 
@@ -118,7 +118,7 @@ public class Regado extends AbstractIntegerProblem {
 			// Si no hay aspersores en los alrededores, se coloca un aspersor tipo 1 con probabilidad 4%
 			int random = (int) (Math.random() * 100);
 			// Heuristica: Se checkea que no se trate del caso donde no hay aspersores en un 3x3.
-			if (tipoAspersor == 0 && random < 4) {
+			if (tipoAspersor == 0 && random < 3) {
 				// Convertir índice lineal a coordenadas 2D
 				boolean foundAspersor = false;
 				for (int dRow = -1; dRow <= 1; dRow++) {
@@ -185,8 +185,8 @@ public class Regado extends AbstractIntegerProblem {
 			break;
 		}
 
-		if (tiempoEncendido < 4 && costo != 0) {
-			costo += (5 - tiempoEncendido) / 2;
+		if (tiempoEncendido < 9 && costo != 0) {
+			costo += (10 - tiempoEncendido) / 2;
 		}
 
 		// Penalizar aspersores en bordes del campo
@@ -269,16 +269,20 @@ public class Regado extends AbstractIntegerProblem {
 		double aguaOptima = capacidadCampo - puntoMarchitez + aguaRequerida;
 
 		// Calcular la proporción del agua actual respecto a la óptima
-		double proporcionAgua = aguaReal / aguaOptima;
+		double proporcionAgua;
 
-		// Calcular desviación hídrica ajustada por la proporción del agua
 		if (aguaReal > aguaOptima) {
-			// La penalización se reduce si la parcela tiene más agua de lo necesario
+			proporcionAgua = aguaReal / aguaOptima;
 			desviacionTotal += Math.pow((aguaReal - aguaOptima) / aguaOptima, toleranciaSobre) * proporcionAgua;
 		} else {
-			// La penalización se reduce si la parcela tiene menos agua de lo necesario
-			desviacionTotal += Math.pow((aguaOptima - aguaReal) / aguaOptima, toleranciaInfra) * (1.0 - proporcionAgua);
+			if (aguaReal == 0) {
+				proporcionAgua = 10;
+			} else {
+				proporcionAgua = aguaOptima / aguaReal;
+			}
+			desviacionTotal += Math.pow((aguaOptima - aguaReal) / aguaOptima, toleranciaInfra) * proporcionAgua;
 		}
+
 
 		return desviacionTotal;
 	}

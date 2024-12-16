@@ -43,8 +43,8 @@ public class GreedyRegado {
         //    }
         // }
 
-        // Elegir la cantidad de iteraciones del greedy entre 1 y 5
-        int randomNumber = (int) (Math.random() * 5) + 1;
+        // Elegir la cantidad de iteraciones del greedy entre 1 y 4
+        int randomNumber = (int) (Math.random() * 4) + 1;
         // Recorrer el campo, con combinaciones i,j random, probando todas solo una vez
         // Arreglo de tamaño n, con los digitos de 1..n en orden aleatorio
         for (int z = 0; z < randomNumber; z++) {
@@ -105,11 +105,11 @@ public class GreedyRegado {
 
       // Probabilidad de añadir un aspersor disminuye según el número de aspersores adyacentes
       double probabilidadBase = 1; // Probabilidad base de colocar un aspersor si no hay adyacentes
-      double probabilidad = probabilidadBase * Math.pow(0.65, aspersoresAdyacentes); // Reduce por cada aspersor adyacente
+      double probabilidad = probabilidadBase * Math.pow(0.55, aspersoresAdyacentes); // Reduce por cada aspersor adyacente
       boolean yaTieneAspersor = configuracionAspersores[i][j] > 0;
       // Evaluar cada tipo de aspersor con tiempos de riego incrementales
       for (int tipo = 0; tipo <= 2; tipo++) {
-          for (int tiempo = 0; tiempo <= 12; tiempo += 1) { // Incrementos de 2
+          for (int tiempo = 4; tiempo <= 30; tiempo += 1) { // Incrementos de 2
               double costo = calcularCosto(tipo, tiempo, i, j);
               configuracionAspersores[i][j] = tipo;
               tiemposRiego[i][j] = tiempo;
@@ -163,13 +163,13 @@ public class GreedyRegado {
                 break;
         }
 
-        if (tiempoEncendido < 4 && costo != 0) {
-            costo += (5 - tiempoEncendido) / 2;
+        if (tiempoEncendido < 9 && costo != 0) {
+            costo += (10 - tiempoEncendido);
         }
 
         // Penalizar aspersores en bordes del campo
         if (i == 0 || i == n - 1 || j == 0 || j == n - 1 && costo != 0) {
-            costo += 4;
+            costo += 2;
         }
 
         return costo;
@@ -205,16 +205,19 @@ public class GreedyRegado {
       // Calcular cantidad de agua optima
       double aguaOptima = capacidadCampo - puntoMarchitez + aguaRequerida;
 
-      // Calcular la proporción del agua actual respecto a la óptima
-      double proporcionAgua = aguaReal / aguaOptima;
+      double proporcionAgua;
 
       // Calcular desviación hídrica ajustada por la proporción del agua
       if (aguaReal > aguaOptima) {
-          // La penalización se reduce si la parcela tiene más agua de lo necesario
+          proporcionAgua = aguaReal / aguaOptima;
           desviacionTotal += Math.pow((aguaReal - aguaOptima) / aguaOptima, toleranciaSobre) * proporcionAgua;
       } else {
-          // La penalización se reduce si la parcela tiene menos agua de lo necesario
-          desviacionTotal += Math.pow((aguaOptima - aguaReal) / aguaOptima, toleranciaInfra) * (1.0 - proporcionAgua);
+          if (aguaReal == 0) {
+              proporcionAgua = 10;
+          } else {
+              proporcionAgua = aguaOptima / aguaReal;
+          }
+          desviacionTotal += Math.pow((aguaOptima - aguaReal) / aguaOptima, toleranciaInfra) * proporcionAgua;
       }
 
       return desviacionTotal;
