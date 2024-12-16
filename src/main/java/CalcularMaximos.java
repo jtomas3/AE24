@@ -15,11 +15,12 @@ public class CalcularMaximos {
     private String[][] suelosCampo;
     private int[][] configuracionAspersores;
     private int[][] tiemposRiego;
+    private int tiempoMaximo;
 
     public CalcularMaximos(int n, Map<String, Map<String, Double>> informacionSuelos,
                         Map<String, Map<String, Double>> informacionCultivos, String[][] cultivosCampo,
                         String[][] suelosCampo, double alpha, double beta, int costoTipo1, int costoTipo2,
-                        int costoTipo3, int riegoPorMinuto) {
+                        int costoTipo3, int riegoPorMinuto, int tiempoMaximo) {
         this.n = n;
         this.alpha = alpha;
         this.beta = beta;
@@ -33,9 +34,10 @@ public class CalcularMaximos {
         this.suelosCampo = suelosCampo;
         this.configuracionAspersores = new int[n][n];
         this.tiemposRiego = new int[n][n];
+        this.tiempoMaximo = tiempoMaximo;
     }
 
-    int calcularCostoMaximo(int n, int costoTipo1, int costoTipo2, int costoTipo3) {
+    int calcularCostoMaximo() {
         int costoMaximo = 0;
 
         // Computar el maximo de costoTipo1, costoTipo2 y costoTipo3
@@ -59,7 +61,7 @@ public class CalcularMaximos {
         return costoMaximo;
     }
 
-    double calcularDesbalanceMaximo(int n, int tiempoMaximo) {
+    double calcularDesbalanceMaximo() {
         // Inicializar configuracionAspersores todos con tipo 3, y tiemposRiego todo en *    para el peor caso
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {

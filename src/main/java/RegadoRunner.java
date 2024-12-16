@@ -60,8 +60,7 @@ public class RegadoRunner {
 			for (int i = 0; i < n; i++) {
 				for (int j = 0; j < n; j++) {
 					int index = i * n + j;
-					desviacionHidrica[i][j] = problem.calcularDesviacionHidricaRelativaParcela(solution, index,
-							riegoTotal);
+					desviacionHidrica[i][j] = problem.calcularDesviacionHidricaRelativaParcela(index, riegoTotal);
 					System.out.print(desviacionHidrica[i][j] + " ");
 				}
 				System.out.println();
@@ -239,8 +238,7 @@ public class RegadoRunner {
 				 for (int i = 0; i < n; i++) {
 				 	for (int j = 0; j < n; j++) {
 				 		int index = i * n + j;
-				 		desviacionHidrica[i][j] = problem.calcularDesviacionHidricaRelativaParcela(solution, index,
-				 				riegoTotal);
+				 		desviacionHidrica[i][j] = problem.calcularDesviacionHidricaRelativaParcela(index, riegoTotal);
 				 		desviacionHidricaReal += Math.abs(desviacionHidrica[i][j]);
 						
 				 		System.out.print(desviacionHidrica[i][j] + " ");
@@ -256,7 +254,7 @@ public class RegadoRunner {
 				exportarAspersoresCSV(solution, "aspersores_"+counter+".csv");
 			}
 
-		return bestSolution;
+		return bestSolutions;
 	}
 
 	private static int contarAspersores(IntegerSolution solution) {

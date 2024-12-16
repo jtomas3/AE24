@@ -55,7 +55,7 @@ public class Regado extends AbstractIntegerProblem {
 
 	public Regado(int n, Map<String, Map<String, Double>> informacionSuelos,
 			Map<String, Map<String, Double>> informacionCultivos, String[][] cultivosCampo, String[][] sueslosCampo,
-			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto, List<int[][]> greedySolutions, int tiempoMaximo) {
+			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto, List<int[][]> greedySolutions, int tiempoMaximo, int tiempoMinimo) {
 		this.n = n;
 		this.informacionSuelos = informacionSuelos;
 		this.informacionCultivos = informacionCultivos;
@@ -82,8 +82,8 @@ public class Regado extends AbstractIntegerProblem {
 				upperLimit.add(2);
 			} else {
 				// Tiempos de riego en minuto
-				lowerLimit.add(4);
-				upperLimit.add(30);
+				lowerLimit.add(tiempoMinimo);
+				upperLimit.add(tiempoMaximo);
 			}
 		}
 
@@ -146,7 +146,7 @@ public class Regado extends AbstractIntegerProblem {
 			}
 
 			costoTotal += calcularCosto(tipoAspersor, solution.getVariable(i + n * n), row, col); // Calcula el costo total, con el tiempo
-			totalDiferenciaHidrica += calcularDesviacionHidricaParcela(solution, i, riegoTotal); // Calcula la
+			totalDiferenciaHidrica += calcularDesviacionHidricaParcela(i, riegoTotal); // Calcula la
 																									// desviación
 																									// hidrica
 		}
@@ -250,7 +250,7 @@ public class Regado extends AbstractIntegerProblem {
 		return riegoTotal;
 	}
 
-	private double calcularDesviacionHidricaParcela(IntegerSolution solution, int index, double[][] riegoTotal) {
+	private double calcularDesviacionHidricaParcela(int index, double[][] riegoTotal) {
 		double desviacionTotal = 0.0;
 		int indice_i_parcela = index / n;
 		int indice_j_parcela = index % n;
@@ -292,7 +292,7 @@ public class Regado extends AbstractIntegerProblem {
 	// Igual que la funcion calcularDesviacionHidricaParcela pero esta solo se usa
 	// para imprimir la tabla final, mostrando donde
 	// faltó agua y donde sobró (incluyendo signo negativo).
-	double calcularDesviacionHidricaRelativaParcela(IntegerSolution solution, int index, double[][] riegoTotal) {
+	double calcularDesviacionHidricaRelativaParcela(int index, double[][] riegoTotal) {
 		double desviacionTotal = 0.0;
 		int indice_i_parcela = index / n;
 		int indice_j_parcela = index % n;
