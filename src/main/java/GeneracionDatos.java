@@ -2,110 +2,111 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GeneracionDatos {
-	static Map<String, Map<String, Double>> obtenerInformacionSuelos() {
-		Map<String, Map<String, Double>> informacionSuelos = new HashMap<>();
+    static Map<String, Map<String, Double>> obtenerInformacionSuelos() {
+        Map<String, Map<String, Double>> informacionSuelos = new HashMap<>();
 
-		// Datos ficticios
-		Map<String, Double> tipoSuelo1 = new HashMap<>();
-		tipoSuelo1.put("h_campo", 25.0);
-		tipoSuelo1.put("h_marchitez", 12.0);
-		informacionSuelos.put("tipo1", tipoSuelo1);
+        // Datos de suelos reales
+        Map<String, Double> sueloArcilloso = new HashMap<>();
+        sueloArcilloso.put("h_campo", 200.0);
+        sueloArcilloso.put("h_marchitez", 100.0);
+        informacionSuelos.put("Arcilloso", sueloArcilloso);
 
-		Map<String, Double> tipoSuelo2 = new HashMap<>();
-		tipoSuelo2.put("h_campo", 90.0);
-		tipoSuelo2.put("h_marchitez", 80.0);
-		informacionSuelos.put("tipo2", tipoSuelo2);
+        Map<String, Double> sueloArenoso = new HashMap<>();
+        sueloArenoso.put("h_campo", 100.0);
+        sueloArenoso.put("h_marchitez", 50.0);
+        informacionSuelos.put("Arenoso", sueloArenoso);
 
-		Map<String, Double> tipoSuelo3 = new HashMap<>();
-		tipoSuelo3.put("h_campo", 50.0);
-		tipoSuelo3.put("h_marchitez", 30.0);
-		informacionSuelos.put("tipo3", tipoSuelo3);
+        Map<String, Double> sueloFranco = new HashMap<>();
+        sueloFranco.put("h_campo", 150.0);
+        sueloFranco.put("h_marchitez", 75.0);
+        informacionSuelos.put("Franco", sueloFranco);
 
-		Map<String, Double> tipoSuelo4 = new HashMap<>();
-		tipoSuelo4.put("h_campo", 40.0);
-		tipoSuelo4.put("h_marchitez", 20.0);
-		informacionSuelos.put("tipo4", tipoSuelo4);
+        Map<String, Double> sueloLimoso = new HashMap<>();
+        sueloLimoso.put("h_campo", 180.0);
+        sueloLimoso.put("h_marchitez", 90.0);
+        informacionSuelos.put("Limoso", sueloLimoso);
 
-		return informacionSuelos;
-	}
+        return informacionSuelos;
+    }
 
-	static Map<String, Map<String, Double>> obtenerInformacionCultivos() {
-		Map<String, Map<String, Double>> informacionCultivos = new HashMap<>();
+    static Map<String, Map<String, Double>> obtenerInformacionCultivos() {
+        Map<String, Map<String, Double>> informacionCultivos = new HashMap<>();
 
-		// Datos ficticios
-		Map<String, Double> tipoCultivo1 = new HashMap<>();
-		tipoCultivo1.put("agua_requerida", 250.0);
-		tipoCultivo1.put("tolerancia_sobre", 1.0);
-		tipoCultivo1.put("tolerancia_infra", 1.0);
-		informacionCultivos.put("cultivo1", tipoCultivo1);
+        // Datos de cultivos reales
+        Map<String, Double> trigo = new HashMap<>();
+        trigo.put("agua_requerida", 450.0);
+        trigo.put("tolerancia_sobre", 1.2);
+        trigo.put("tolerancia_infra", 0.8);
+        informacionCultivos.put("Trigo", trigo);
 
-		Map<String, Double> tipoCultivo2 = new HashMap<>();
-		tipoCultivo2.put("agua_requerida", 300.0);
-		tipoCultivo2.put("tolerancia_sobre", 1.0);
-		tipoCultivo2.put("tolerancia_infra", 1.0);
-		informacionCultivos.put("cultivo2", tipoCultivo2);
+        Map<String, Double> maiz = new HashMap<>();
+        maiz.put("agua_requerida", 600.0);
+        maiz.put("tolerancia_sobre", 1.1);
+        maiz.put("tolerancia_infra", 0.9);
+        informacionCultivos.put("Maíz", maiz);
 
-		Map<String, Double> tipoCultivo3 = new HashMap<>();
-		tipoCultivo3.put("agua_requerida", 200.0);
-		tipoCultivo3.put("tolerancia_sobre", 1.0);
-		tipoCultivo3.put("tolerancia_infra", 1.0);
-		informacionCultivos.put("cultivo3", tipoCultivo3);
+        Map<String, Double> arroz = new HashMap<>();
+        arroz.put("agua_requerida", 1200.0);
+        arroz.put("tolerancia_sobre", 1.0);
+        arroz.put("tolerancia_infra", 0.7);
+        informacionCultivos.put("Arroz", arroz);
 
-		Map<String, Double> tipoCultivo4 = new HashMap<>();
-		tipoCultivo4.put("agua_requerida", 150.0);
-		tipoCultivo4.put("tolerancia_sobre", 1.0);
-		tipoCultivo4.put("tolerancia_infra", 1.0);
-		informacionCultivos.put("cultivo4", tipoCultivo4);
+        Map<String, Double> soja = new HashMap<>();
+        soja.put("agua_requerida", 500.0);
+        soja.put("tolerancia_sobre", 1.1);
+        soja.put("tolerancia_infra", 0.9);
+        informacionCultivos.put("Soja", soja);
 
-		return informacionCultivos;
-	}
+        return informacionCultivos;
+    }
 
-	static String[][] obtenerCultivosCampo(int n) {
-		String[][] cultivosCampo = new String[n][n];
+    static String[][] obtenerCultivosCampo(int n) {
+        String[][] cultivosCampo = new String[n][n];
 
-		// Datos ficticios
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				if (i < n / 2) {
-					if (j < n / 2) {
-						cultivosCampo[i][j] = "cultivo1";
-					} else {
-						cultivosCampo[i][j] = "cultivo2";
-					}
-				} else {
-					if (j < n / 2) {
-						cultivosCampo[i][j] = "cultivo3";
-					} else {
-						cultivosCampo[i][j] = "cultivo4";
-					}
-				}
-			}
-		}
+        // Asignar cultivos reales al campo
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i < n / 2) {
+                    if (j < n / 2) {
+                        cultivosCampo[i][j] = "Trigo";
+                    } else {
+                        cultivosCampo[i][j] = "Maíz";
+                    }
+                } else {
+                    if (j < n / 2) {
+                        cultivosCampo[i][j] = "Arroz";
+                    } else {
+                        cultivosCampo[i][j] = "Soja";
+                    }
+                }
+            }
+        }
 
-		return cultivosCampo;
-	}
+        return cultivosCampo;
+    }
 
-	static String[][] obtenerSuelosCampo(int n) {
-		String[][] suelosCampo = new String[n][n];
+    static String[][] obtenerSuelosCampo(int n) {
+        String[][] suelosCampo = new String[n][n];
 
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				if (i < n / 2) {
-					if (j < n / 2) {
-						suelosCampo[i][j] = "tipo1";
-					} else {
-						suelosCampo[i][j] = "tipo2";
-					}
-				} else {
-					if (j < n / 2) {
-						suelosCampo[i][j] = "tipo3";
-					} else {
-						suelosCampo[i][j] = "tipo4";
-					}
-				}
-			}
-		}
+        // Asignar suelos reales al campo
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i < n / 2) {
+                    if (j < n / 2) {
+                        suelosCampo[i][j] = "Arcilloso";
+                    } else {
+                        suelosCampo[i][j] = "Arenoso";
+                    }
+                } else {
+                    if (j < n / 2) {
+                        suelosCampo[i][j] = "Franco";
+                    } else {
+                        suelosCampo[i][j] = "Limoso";
+                    }
+                }
+            }
+        }
 
-		return suelosCampo;
-	}
+        return suelosCampo;
+    }
 }

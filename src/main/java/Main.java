@@ -9,13 +9,13 @@ import java.util.concurrent.Future;
 public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
-		int n = 10;
+		int n = 40;
 		double alpha = 0.9;
 		double beta = 0.8;
 		int costoTipo1 = 1;
 		int costoTipo2 = 1;
 		int costoTipo3 = 1;
-		int riegoPorMinuto = 10;
+		int riegoPorMinuto = 40;
 		int tiempoMinimo = 4;
 		int tiempoMaximo = 30;
 		int tamañoPoblacion = 50;
@@ -65,7 +65,7 @@ public class Main {
 				futures.add(executor.submit(() -> {
 					System.out.println("Iniciando Greedy número " + greedyIndex);
 					return new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
-							alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto).ejecutar();
+							alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto, tiempoMinimo, tiempoMaximo).ejecutar();
 				}));
 			}
 
@@ -87,7 +87,7 @@ public class Main {
 		case 3:
 			System.out.println("Ejecutando Greedy...");
 			new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo, alpha, beta,
-					costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto).ejecutar();
+					costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto, tiempoMinimo, tiempoMaximo).ejecutar();
 			return;
 
 		default:

@@ -62,7 +62,7 @@ public class CalcularMaximos {
     }
 
     double calcularDesbalanceMaximo() {
-        // Inicializar configuracionAspersores todos con tipo 3, y tiemposRiego todo en *    para el peor caso
+        // Inicializar configuracionAspersores todos con tipo 3, y tiemposRiego todo en tiempos maximos para el peor caso
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 configuracionAspersores[i][j] = 2;

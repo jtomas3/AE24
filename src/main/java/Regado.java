@@ -55,7 +55,8 @@ public class Regado extends AbstractIntegerProblem {
 
 	public Regado(int n, Map<String, Map<String, Double>> informacionSuelos,
 			Map<String, Map<String, Double>> informacionCultivos, String[][] cultivosCampo, String[][] sueslosCampo,
-			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto, List<int[][]> greedySolutions, int tiempoMaximo, int tiempoMinimo) {
+			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto,
+			List<int[][]> greedySolutions, int tiempoMaximo, int tiempoMinimo) {
 		this.n = n;
 		this.informacionSuelos = informacionSuelos;
 		this.informacionCultivos = informacionCultivos;
@@ -98,7 +99,8 @@ public class Regado extends AbstractIntegerProblem {
 		if (greedySolutions != null && indiceGreedySolution < greedySolutions.size()) {
 			int[][] greedySolution = greedySolutions.get(indiceGreedySolution);
 			indiceGreedySolution++;
-			return new CustomDefaultIntegerSolution(this.getVariableBounds(), this.getNumberOfObjectives(), greedySolution);
+			return new CustomDefaultIntegerSolution(this.getVariableBounds(), this.getNumberOfObjectives(),
+					greedySolution);
 		}
 		return new CustomDefaultIntegerSolution(this.getVariableBounds(), this.getNumberOfObjectives(), null);
 	}
@@ -115,63 +117,54 @@ public class Regado extends AbstractIntegerProblem {
 			int tipoAspersor = solution.getVariable(i);
 			int row = i / n;
 			int col = i % n;
-			// Si no hay aspersores en los alrededores, se coloca un aspersor tipo 1 con probabilidad 4%
+			// Si no hay aspersores en los alrededores, se coloca un aspersor con
+			// probabilidad baja
 			int random = (int) (Math.random() * 100);
-			// Heuristica: Se checkea que no se trate del caso donde no hay aspersores en un 3x3.
+			// Heuristica: Se checkea que no se trate del caso donde no hay aspersores en un
+			// 3x3.
 			if (tipoAspersor == 0 && random < 3) {
 				// Convertir índice lineal a coordenadas 2D
 				boolean foundAspersor = false;
 				for (int dRow = -1; dRow <= 1; dRow++) {
-							for (int dCol = -1; dCol <= 1; dCol++) {
-									if (dRow == 0 && dCol == 0) continue; // Saltar la parcela actual
-									int neighborRow = row + dRow;
-									int neighborCol = col + dCol;
-									if (neighborRow >= 0 && neighborRow < n && neighborCol >= 0 && neighborCol < n) {
-											int neighborIndex = neighborRow * n + neighborCol;
-											if (solution.getVariable(neighborIndex) > 0) {
-													foundAspersor = true;
-													break;
-											}
-									}
+					for (int dCol = -1; dCol <= 1; dCol++) {
+						if (dRow == 0 && dCol == 0)
+							continue; // Saltar la parcela actual
+						int neighborRow = row + dRow;
+						int neighborCol = col + dCol;
+						if (neighborRow >= 0 && neighborRow < n && neighborCol >= 0 && neighborCol < n) {
+							int neighborIndex = neighborRow * n + neighborCol;
+							if (solution.getVariable(neighborIndex) > 0) {
+								foundAspersor = true;
+								break;
 							}
-							if (foundAspersor) break;
+						}
+					}
+					if (foundAspersor)
+						break;
 				}
 
 				if (!foundAspersor) {
-					// Colocar un aspersor tipo 2 en la parcela actual si no hay en los alrededores
-					solution.setVariable(i, 1);
+					// Colocar un aspersor en la parcela actual si no hay en los alrededores
+					solution.setVariable(i, 2);
 					solution.setVariable(i + n * n, 10); // Establecer tiempo de riego a 10 default
 					tipoAspersor = 1; // Actualizar el tipo de aspersor para continuar con la evaluación
 				}
 			}
 
-			costoTotal += calcularCosto(tipoAspersor, solution.getVariable(i + n * n), row, col); // Calcula el costo total, con el tiempo
+			costoTotal += calcularCosto(tipoAspersor, solution.getVariable(i + n * n), row, col, solution); // Calcula el costo
+																									// total, con el
+																									// tiempo
 			totalDiferenciaHidrica += calcularDesviacionHidricaParcela(i, riegoTotal); // Calcula la
-																									// desviación
-																									// hidrica
+																						// desviación
+																						// hidrica
 		}
-
-//		if ((cantidadEvaluaciones % 10000) == 0) {
-//			System.out.println("Evaluación numero " + cantidadEvaluaciones);
-//			// Imprimir solucion actual en forma matricial
-//			for (int i = 0; i < n; i++) {
-//				for (int j = 0; j < n; j++) {
-//					int index = i * n + j;
-//					System.out.print(solution.getVariable(index) + " ");
-//				}
-//				System.out.println();
-//			}
-//			System.out.println("----");
-//			System.out.println("Costo total: " + costoTotal);
-//			System.out.println("Desviación total: " + totalDiferenciaHidrica);
-//		}
 
 		// Establecer los objetivos
 		solution.setObjective(0, totalDiferenciaHidrica);
 		solution.setObjective(1, costoTotal);
 	}
 
-	private int calcularCosto(int tipoAspersor, int tiempoEncendido, int i, int j) {
+	private int calcularCosto(int tipoAspersor, int tiempoEncendido, int i, int j, IntegerSolution solution) {
 		int costo = 0;
 		switch (tipoAspersor) {
 		case 1:
@@ -225,14 +218,14 @@ public class Regado extends AbstractIntegerProblem {
 					}
 					if (tipoAspersor == 2) {
 						// Riego en las parcelas (a distancia 2)
-						 if (i - 2 >= 0)
-						 	riegoTotal[i - 2][j] += x * beta * tiempoEncendido;
-						 if (i + 2 < n)
-						 	riegoTotal[i + 2][j] += x * beta * tiempoEncendido;
-						 if (j - 2 >= 0)
-						 	riegoTotal[i][j - 2] += x * beta * tiempoEncendido;
-						 if (j + 2 < n)
-						 	riegoTotal[i][j + 2] += x * beta * tiempoEncendido;
+						if (i - 2 >= 0)
+							riegoTotal[i - 2][j] += x * beta * tiempoEncendido;
+						if (i + 2 < n)
+							riegoTotal[i + 2][j] += x * beta * tiempoEncendido;
+						if (j - 2 >= 0)
+							riegoTotal[i][j - 2] += x * beta * tiempoEncendido;
+						if (j + 2 < n)
+							riegoTotal[i][j + 2] += x * beta * tiempoEncendido;
 						// Diagonales
 						if (i - 1 >= 0 && j - 1 >= 0)
 							riegoTotal[i - 1][j - 1] += x * beta * tiempoEncendido;
@@ -273,21 +266,18 @@ public class Regado extends AbstractIntegerProblem {
 
 		if (aguaReal > aguaOptima) {
 			proporcionAgua = aguaReal / aguaOptima;
-			desviacionTotal += Math.pow((aguaReal - aguaOptima) / aguaOptima, toleranciaSobre) * proporcionAgua;
+			desviacionTotal += Math.pow((aguaReal - aguaOptima) / aguaOptima, 1/toleranciaSobre) * proporcionAgua;
 		} else {
 			if (aguaReal == 0) {
 				proporcionAgua = 10;
 			} else {
 				proporcionAgua = aguaOptima / aguaReal;
 			}
-			desviacionTotal += Math.pow((aguaOptima - aguaReal) / aguaOptima, toleranciaInfra) * proporcionAgua;
+			desviacionTotal += Math.pow((aguaOptima - aguaReal) / aguaOptima, 1/toleranciaInfra) * proporcionAgua;
 		}
-
 
 		return desviacionTotal;
 	}
-
-
 
 	// Igual que la funcion calcularDesviacionHidricaParcela pero esta solo se usa
 	// para imprimir la tabla final, mostrando donde
