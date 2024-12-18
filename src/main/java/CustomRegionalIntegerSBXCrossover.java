@@ -52,13 +52,13 @@ public class CustomRegionalIntegerSBXCrossover implements CrossoverOperator<Inte
     private List<IntegerSolution> doCrossover(double probability, IntegerSolution parent1, IntegerSolution parent2) {
         IntegerSolution child1 = (IntegerSolution) parent1.copy();
         IntegerSolution child2 = (IntegerSolution) parent2.copy();
-        int n = (int) Math.sqrt(parent1.getNumberOfVariables() / 2); // Asume un campo cuadrado y que cada aspersor tiene dos variables (tipo y tiempo)
+        int n = (int) Math.sqrt(parent1.getNumberOfVariables() / 2);
 
         if ((Double)this.randomGenerator.getRandomValue() <= probability) {
             int numRegionsPerSide = n / regionSize;
             for (int regionRow = 0; regionRow < numRegionsPerSide; regionRow++) {
                 for (int regionCol = 0; regionCol < numRegionsPerSide; regionCol++) {
-                    if ((Double)this.randomGenerator.getRandomValue() <= 0.5) { // 50% chance to swap this region
+                    if ((Double)this.randomGenerator.getRandomValue() <= 0.5) {
                         for (int i = 0; i < regionSize; i++) {
                             for (int j = 0; j < regionSize; j++) {
                                 int idx = ((regionRow * regionSize + i) * n + (regionCol * regionSize + j));

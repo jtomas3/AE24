@@ -16,42 +16,42 @@ public class CustomIntegerMutation extends IntegerPolynomialMutation {
             throw new JMetalException("Null parameter");
         }
 
-        // Realiza la mutación polinomial estándar
+        // Realiza mutación polinomial estándar
         super.execute(solution);
 
         int index;
 
-        // Aplica la mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
+        // Aplica mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
         index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
         mergeAdjacentSprinklers(solution, index);
-        // Aplica la mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
+        // Aplica mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
         index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
         mergeAdjacentSprinklers(solution, index);
-        // Aplica la mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
+        // Aplica mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
         index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
         mergeAdjacentSprinklers(solution, index);
 
-        // Aplica la mutación adicional para fusionar aspersores en línea
+        // Aplica mutación adicional para fusionar aspersores en línea
         index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
         mergeInlineSprinklers(solution, index);
-        // Aplica la mutación adicional para fusionar aspersores en línea
+        // Aplica mutación adicional para fusionar aspersores en línea
         index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
         mergeInlineSprinklers(solution, index);
         
-        // Aplica la mutación adicional para colocar aspersores aislados
-        if (JMetalRandom.getInstance().nextDouble() < 0.2) {  // Probabilidad adicional de mover un aspersor
+        // Aplica mutación adicional para colocar aspersores aislados
+        if (JMetalRandom.getInstance().nextDouble() < 0.2) {
             index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
             placeIsolatedSprinkler(solution, index);
         }
 
-        // Aplica la mutación adicional para mover aspersores si es posible
-        if (JMetalRandom.getInstance().nextDouble() < 0.05) {  // Probabilidad adicional de mover un aspersor
+        // Aplica mutación adicional para mover aspersores si es posible
+        if (JMetalRandom.getInstance().nextDouble() < 0.05) {
             index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
             moveSprinklerIfPossible(solution, index);
         }
 
-        // Aplica la mutación adicional para centralizar aspersores
-        if (JMetalRandom.getInstance().nextDouble() < 0.1) { // Probabilidad baja, ajustable según necesidades
+        // Aplica mutación adicional para centralizar aspersores
+        if (JMetalRandom.getInstance().nextDouble() < 0.1) {
             index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
             centralizeSprinkler(solution, index);
         }
@@ -71,8 +71,8 @@ public class CustomIntegerMutation extends IntegerPolynomialMutation {
             int newJ = j + dir[1];
             if (newI >= 0 && newI < n && newJ >= 0 && newJ < n) {
                 int newIndex = newI * n + newJ;
-                if (newIndex < solution.getNumberOfVariables() / 2) { // Asegurarse de que el nuevo índice está dentro de los límites
-                    if (solution.getVariable(newIndex) == 0) { // Asumimos que '0' indica ausencia de aspersor
+                if (newIndex < solution.getNumberOfVariables() / 2) {
+                    if (solution.getVariable(newIndex) == 0) {
                         // Intercambio de aspersor y su tiempo
                         int tempType = solution.getVariable(index);
                         int tempTime = solution.getVariable(index + solution.getNumberOfVariables() / 2);
@@ -96,7 +96,6 @@ public class CustomIntegerMutation extends IntegerPolynomialMutation {
 
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {1, -1}, {-1, -1}, {1, 1}};
 
-        // Loop through shuffled directions and attempt to merge
         for (int[] dir : directions) {
             int newI = i + dir[0];
             int newJ = j + dir[1];
@@ -107,13 +106,12 @@ public class CustomIntegerMutation extends IntegerPolynomialMutation {
                     int originalTime = solution.getVariable(index + solution.getNumberOfVariables() / 2);
                     int adjacentTime = solution.getVariable(newIndex + solution.getNumberOfVariables() / 2);
 
-                    // New sprinkler type is 2
                     solution.setVariable(index, 2);
                     
-                    // Set new time as the sum of both sprinkler times
+                    // Setear el tiempo de riego como la suma de los tiempos de los aspersores adyacentes
                     solution.setVariable(index + solution.getNumberOfVariables() / 2, originalTime + adjacentTime);
                     
-                    // Remove the adjacent sprinkler
+                    // Remover aspersor adyacente
                     solution.setVariable(newIndex, 0);
                     solution.setVariable(newIndex + solution.getNumberOfVariables() / 2, 0);
                     break;
@@ -194,47 +192,44 @@ public class CustomIntegerMutation extends IntegerPolynomialMutation {
         int n = (int) Math.sqrt(solution.getNumberOfVariables() / 2);
         int i = index / n;
         int j = index % n;
-        int leftCount = 0;
-        int leftRiego = 0;
-        int rightCount = 0;
-        int rightRiego = 0;
 
-        // Contar aspersores a la izquierda
-        for (int k = 1; k <= 2; k++) {
-            int newJ = j - k; // Moverse hacia la izquierda
-            if (newJ >= 0 && solution.getVariable(i * n + newJ) > 0) {
-                leftCount++;
-                leftRiego += solution.getVariable(i * n + newJ + n*n);
-            }
+        int leftIndex = (i-1) * n + j;
+        int rightIndex = (i+1) * n + j;
+        int topIndex = i * n + (j - 1);
+        int bottomIndex = i * n + (j + 1);
+
+        // Checkear si hay aspersores en las posiciones adyacentes horizontales
+        if (i > 0 && i < n - 1 && solution.getVariable(leftIndex) != 0 && solution.getVariable(rightIndex) != 0) {
+            // Mergear aspersores
+            int leftTime = solution.getVariable(leftIndex + n * n);
+            int rightTime = solution.getVariable(rightIndex + n * n);
+
+            // Nuevo aspersor tipo 2 en la posición actual
+            solution.setVariable(index, 2);
+            solution.setVariable(index + n * n, leftTime + rightTime);
+
+            // Sacar los aspersores adyacentes
+            solution.setVariable(leftIndex, 0);
+            solution.setVariable(leftIndex + n * n, 0);
+            solution.setVariable(rightIndex, 0);
+            solution.setVariable(rightIndex + n * n, 0);
         }
-        
-        // Contar aspersores a la derecha
-        for (int k = 1; k <= 2; k++) {
-            int newJ = j + k; // Moverse hacia la derecha
-            if (newJ < n && solution.getVariable(i * n + newJ) > 0) {
-                rightCount++;
-                rightRiego += solution.getVariable(i * n + newJ + n*n);
-            }
-        }
-        
-        // Aplicar mutación si hay 4 o más aspersores en cualquier lado
-        if (leftCount == 2) {
-            int middleJ = j - 1;
-            if (middleJ >= 0) {
-                solution.setVariable(i * n + middleJ, 1); 
-                solution.setVariable(i * n + middleJ + n*n, leftRiego);
-                solution.setVariable(i * n + middleJ + 1, 0); // Eliminar aspersor izquierdo
-                solution.setVariable(i * n + middleJ + 1 + n*n, 0); // Eliminar tiempo de riego
-            }
-        }
-        if (rightCount == 2) {
-            int middleJ = j + 1;
-            if (middleJ < n) {
-                solution.setVariable(i * n + middleJ, 1);
-                solution.setVariable(i * n + middleJ + n*n, rightRiego);
-                solution.setVariable(i * n + middleJ - 1, 0); // Eliminar aspersor derecho
-                solution.setVariable(i * n + middleJ - 1 + n*n, 0); // Eliminar tiempo de riego
-            }
+
+        // Checkear si hay aspersores en las posiciones adyacentes verticales
+        if (j > 0 && j < n - 1 && solution.getVariable(topIndex) != 0 && solution.getVariable(bottomIndex) != 0) {
+            // Mergear aspersores
+            int topTime = solution.getVariable(topIndex + n * n);
+            int bottomTime = solution.getVariable(bottomIndex + n * n);
+
+            // Nuevo aspersor tipo 2 en la posición actual
+            solution.setVariable(index, 2);
+            solution.setVariable(index + n * n, topTime + bottomTime);
+
+            // Sacar los aspersores adyacentes
+            solution.setVariable(topIndex, 0);
+            solution.setVariable(topIndex + n * n, 0);
+            solution.setVariable(bottomIndex, 0);
+            solution.setVariable(bottomIndex + n * n, 0);
         }
     }
 

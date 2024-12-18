@@ -1,7 +1,6 @@
 import java.util.Map;
 
 public class CalcularMaximos {
-    // TODO: Usar una clase abstracta para CalcularMaximos y GreedyRegado, hay duplciados
     private int n;
     private double alpha;
     private double beta;
@@ -79,7 +78,6 @@ public class CalcularMaximos {
         return desviacionTotal;
     }
 
-    // TODO: Metodos duplicados de GreedyRegado
     private double calcularDesviacionHidrica(double[][] riegoTotal, int n) {
         double desviacionTotal = 0.0;
 
@@ -93,7 +91,6 @@ public class CalcularMaximos {
         return desviacionTotal;
     }
 
-    // TODO: Sacar parametros no usados
     private double calcularDesviacionHidricaParcela(int i, int j, double[][] riegoTotal) {
         double desviacionTotal = 0.0;
 

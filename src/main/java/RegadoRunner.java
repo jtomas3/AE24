@@ -173,9 +173,6 @@ public class RegadoRunner {
 
 		List<IntegerSolution> prioritizedSolutions = new ArrayList<>();
 		for (IntegerSolution solution : population) {
-			// Calcula un score ponderado (puedes ajustar los pesos según necesites)
-			// double normalizedObjective0 = (maxObjective0 - solution.getObjective(0)) / (maxObjective0 - 0); // Normalizar
-			// double normalizedObjective1 = (maxObjective1 - solution.getObjective(1)) / (maxObjective1 - 0); // Normalizar
 			// Normalizar los objetivos usando la media y desviación estándar, con valor absoluto
 			double normalizedObjective0 = Math.abs((solution.getObjective(0) - (avgObjective0 / 10)) / stdDevObjective0);
 			double normalizedObjective1 = Math.abs((solution.getObjective(1) - avgObjective1) / stdDevObjective1);

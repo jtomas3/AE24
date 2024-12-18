@@ -184,7 +184,6 @@ public class GreedyRegado {
       return desviacionTotal;
     }
 
-    // TODO: Sacar parametros no usados
     private double calcularDesviacionHidricaParcela(int i, int j, int tipo, int tiempo, double[][] riegoTotal) {
       double desviacionTotal = 0.0;
 
