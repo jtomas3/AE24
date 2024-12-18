@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
 public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
-		int n = 20;
+		int n = 40;
 		double alpha = 0.9;
 		double beta = 0.8;
 		int costoTipo1 = 1;
@@ -22,7 +22,7 @@ public class Main {
 		int matingPoolSize = 16;
 		int offspringPopulationSize = 14;
 		int regionCrossoverSize = 5;
-		double proporcionGreedy = 4 / 5.0;
+		double proporcionGreedy = 3 / 5.0;
 		Map<String, Map<String, Double>> informacionSuelos = GeneracionDatos.obtenerInformacionSuelos();
 		Map<String, Map<String, Double>> informacionCultivos = GeneracionDatos.obtenerInformacionCultivos();
 		String[][] cultivosCampo = GeneracionDatos.obtenerCultivosCampo(n);
