@@ -9,17 +9,20 @@ import java.util.concurrent.Future;
 public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
-		int n = 10;
+		int n = 20;
 		double alpha = 0.9;
 		double beta = 0.8;
 		int costoTipo1 = 1;
 		int costoTipo2 = 1;
 		int costoTipo3 = 1;
 		int riegoPorMinuto = 10;
+		int tiempoMinimo = 4;
 		int tiempoMaximo = 30;
-		int tamañoPoblacion = 50;
-		int matingPoolSize = 40;
-		int offspringPopulationSize = 35;
+		int tamañoPoblacion = 24;
+		int matingPoolSize = 20;
+		int offspringPopulationSize = 18;
+		int regionCrossoverSize = 5;
+		double proporcionGreedy = 4 / 5.0;
 		Map<String, Map<String, Double>> informacionSuelos = GeneracionDatos.obtenerInformacionSuelos();
 		Map<String, Map<String, Double>> informacionCultivos = GeneracionDatos.obtenerInformacionCultivos();
 		String[][] cultivosCampo = GeneracionDatos.obtenerCultivosCampo(n);
@@ -27,9 +30,9 @@ public class Main {
 
 		// Parametros
 		CalcularMaximos calculador = new CalcularMaximos(n, informacionSuelos, informacionCultivos, cultivosCampo,
-				suelosCampo, alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto);
-		int costoMaximo = calculador.calcularCostoMaximo(n, costoTipo1, costoTipo2, costoTipo3);
-		double desbalanceMaximo = calculador.calcularDesbalanceMaximo(n, tiempoMaximo);
+				suelosCampo, alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto, tiempoMaximo);
+		int costoMaximo = calculador.calcularCostoMaximo();
+		double desbalanceMaximo = calculador.calcularDesbalanceMaximo();
 
 		System.out.println("Costo máximo: " + costoMaximo);
 		System.out.println("Desbalance máximo: " + desbalanceMaximo);
@@ -52,9 +55,7 @@ public class Main {
 		case 2:
 			System.out.println("Algoritmo Genetico empezando con solucion Greedy fue seleccionado...");
 			System.out.println("Tamaño de la población: " + tamañoPoblacion);
-			// Tomar 4/5 de la población como soluciones Greedy. Castear a int para
-			// redondear hacia abajo.
-			int cantidadGreedySolutions = (int) Math.floor(tamañoPoblacion * 4 / 5.0);
+			int cantidadGreedySolutions = (int) Math.floor(tamañoPoblacion * proporcionGreedy);
 			System.out.println("Cantidad de soluciones Greedy a generar: " + cantidadGreedySolutions);
 
 			ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -65,7 +66,7 @@ public class Main {
 				futures.add(executor.submit(() -> {
 					System.out.println("Iniciando Greedy número " + greedyIndex);
 					return new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo,
-							alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto).ejecutar();
+							alpha, beta, costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto, tiempoMinimo, tiempoMaximo).ejecutar();
 				}));
 			}
 
@@ -87,7 +88,7 @@ public class Main {
 		case 3:
 			System.out.println("Ejecutando Greedy...");
 			new GreedyRegado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo, alpha, beta,
-					costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto).ejecutar();
+					costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto, tiempoMinimo, tiempoMaximo).ejecutar();
 			return;
 
 		default:
@@ -97,7 +98,7 @@ public class Main {
 
 		// Crear una instancia del problema
 		Regado problema = new Regado(n, informacionSuelos, informacionCultivos, cultivosCampo, suelosCampo, alpha, beta,
-				costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto, greedySolutions, tiempoMaximo);
+				costoTipo1, costoTipo2, costoTipo3, riegoPorMinuto, greedySolutions, tiempoMaximo, tiempoMinimo);
 
 		RegadoRunner runner = new RegadoRunner();
 
@@ -110,14 +111,14 @@ public class Main {
 		case 1:
 			System.out.println("Ejecutando el algoritmo una vez...");
 			runner.runAlgorithmOnce(problema, desbalanceMaximo, costoMaximo, tamañoPoblacion, matingPoolSize,
-					offspringPopulationSize);
+					offspringPopulationSize, regionCrossoverSize);
 			break;
 
 		case 2:
 			System.out.println("Ingrese el número de ejecuciones:");
 			int numEjecuciones = scanner.nextInt();
 			runner.runMultipleExecutions(problema, numEjecuciones, desbalanceMaximo, costoMaximo, tamañoPoblacion,
-					matingPoolSize, offspringPopulationSize);
+					matingPoolSize, offspringPopulationSize, regionCrossoverSize);
 			break;
 
 		default:

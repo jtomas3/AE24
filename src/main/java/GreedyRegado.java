@@ -14,11 +14,13 @@ public class GreedyRegado {
     private String[][] suelosCampo;
     private int[][] configuracionAspersores;
     private int[][] tiemposRiego;
+    private int tiempoMinimo;
+    private int tiempoMaximo;
 
     public GreedyRegado(int n, Map<String, Map<String, Double>> informacionSuelos,
                         Map<String, Map<String, Double>> informacionCultivos, String[][] cultivosCampo,
                         String[][] suelosCampo, double alpha, double beta, int costoTipo1, int costoTipo2,
-                        int costoTipo3, int riegoPorMinuto) {
+                        int costoTipo3, int riegoPorMinuto, int tiempoMinimo, int tiempoMaximo) {
         this.n = n;
         this.alpha = alpha;
         this.beta = beta;
@@ -32,22 +34,16 @@ public class GreedyRegado {
         this.suelosCampo = suelosCampo;
         this.configuracionAspersores = new int[n][n];
         this.tiemposRiego = new int[n][n];
+        this.tiempoMinimo = tiempoMinimo;
+        this.tiempoMaximo = tiempoMaximo;
     }
 
     public int[][] ejecutar() {
-
-        // Recorrer el campo en orden
-        // for (int i = 0; i < n; i++) {
-        //     for (int j = 0; j < n; j++) {
-        //         seleccionarMejorConfiguracion(i, j);
-        //    }
-        // }
-
         // Elegir la cantidad de iteraciones del greedy entre 1 y 4
         int randomNumber = (int) (Math.random() * 4) + 1;
         // Recorrer el campo, con combinaciones i,j random, probando todas solo una vez
-        // Arreglo de tamaño n, con los digitos de 1..n en orden aleatorio
         for (int z = 0; z < randomNumber; z++) {
+        	// Arreglo de tamaño n, con los digitos de 1..n en orden aleatorio
             int[] randomOrder = new int[n];
             for (int i = 0; i < n; i++) {
                 randomOrder[i] = i;
@@ -105,11 +101,11 @@ public class GreedyRegado {
 
       // Probabilidad de añadir un aspersor disminuye según el número de aspersores adyacentes
       double probabilidadBase = 1; // Probabilidad base de colocar un aspersor si no hay adyacentes
-      double probabilidad = probabilidadBase * Math.pow(0.55, aspersoresAdyacentes); // Reduce por cada aspersor adyacente
+      double probabilidad = probabilidadBase * Math.pow(0.6, aspersoresAdyacentes); // Reduce por cada aspersor adyacente
       boolean yaTieneAspersor = configuracionAspersores[i][j] > 0;
       // Evaluar cada tipo de aspersor con tiempos de riego incrementales
       for (int tipo = 0; tipo <= 2; tipo++) {
-          for (int tiempo = 4; tiempo <= 30; tiempo += 1) { // Incrementos de 2
+          for (int tiempo = tiempoMinimo; tiempo <= tiempoMaximo; tiempo += 2) { // Incrementos de 2
               double costo = calcularCosto(tipo, tiempo, i, j);
               configuracionAspersores[i][j] = tipo;
               tiemposRiego[i][j] = tiempo;
@@ -163,13 +159,13 @@ public class GreedyRegado {
                 break;
         }
 
-        if (tiempoEncendido < 9 && costo != 0) {
-            costo += (10 - tiempoEncendido);
+        if (tiempoEncendido < 8 && costo != 0) {
+            costo += (10 - tiempoEncendido)/2;
         }
 
         // Penalizar aspersores en bordes del campo
         if (i == 0 || i == n - 1 || j == 0 || j == n - 1 && costo != 0) {
-            costo += 2;
+            costo += 3;
         }
 
         return costo;
@@ -210,14 +206,14 @@ public class GreedyRegado {
       // Calcular desviación hídrica ajustada por la proporción del agua
       if (aguaReal > aguaOptima) {
           proporcionAgua = aguaReal / aguaOptima;
-          desviacionTotal += Math.pow((aguaReal - aguaOptima) / aguaOptima, toleranciaSobre) * proporcionAgua;
+          desviacionTotal += Math.pow((aguaReal - aguaOptima) / aguaOptima, 1/toleranciaSobre) * proporcionAgua;
       } else {
           if (aguaReal == 0) {
               proporcionAgua = 10;
           } else {
               proporcionAgua = aguaOptima / aguaReal;
           }
-          desviacionTotal += Math.pow((aguaOptima - aguaReal) / aguaOptima, toleranciaInfra) * proporcionAgua;
+          desviacionTotal += Math.pow((aguaOptima - aguaReal) / aguaOptima, 1/toleranciaInfra) * proporcionAgua;
       }
 
       return desviacionTotal;
