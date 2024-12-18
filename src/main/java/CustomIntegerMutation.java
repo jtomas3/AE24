@@ -33,9 +33,15 @@ public class CustomIntegerMutation extends IntegerPolynomialMutation {
         // Aplica la mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
         index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
         mergeAdjacentSprinklers(solution, index);
+        // Aplica la mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
+        index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
+        mergeAdjacentSprinklers(solution, index);
+        // Aplica la mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
+        index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
+        mergeAdjacentSprinklers(solution, index);
 
         // Aplica la mutación adicional para colocar aspersores aislados
-        if (JMetalRandom.getInstance().nextDouble() < 0.1) {  // Probabilidad adicional de mover un aspersor
+        if (JMetalRandom.getInstance().nextDouble() < 0.2) {  // Probabilidad adicional de mover un aspersor
             index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
             placeIsolatedSprinkler(solution, index);
         }
@@ -61,6 +67,7 @@ public class CustomIntegerMutation extends IntegerPolynomialMutation {
         int j = index % n;
 
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {1, -1}, {-1, -1}, {1, 1}};
+        shuffleArray(directions);
         for (int[] dir : directions) {
             int newI = i + dir[0];
             int newJ = j + dir[1];
@@ -90,7 +97,6 @@ public class CustomIntegerMutation extends IntegerPolynomialMutation {
         int j = index % n;
 
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {1, -1}, {-1, -1}, {1, 1}};
-        shuffleArray(directions);  // Shuffle directions to randomize the merge direction
 
         // Loop through shuffled directions and attempt to merge
         for (int[] dir : directions) {
