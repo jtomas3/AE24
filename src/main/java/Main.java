@@ -18,10 +18,10 @@ public class Main {
 		int riegoPorMinuto = 10;
 		int tiempoMinimo = 4;
 		int tiempoMaximo = 30;
-		int tamañoPoblacion = 24;
-		int matingPoolSize = 20;
-		int offspringPopulationSize = 18;
-		int regionCrossoverSize = 3;
+		int tamañoPoblacion = 20;
+		int matingPoolSize = 16;
+		int offspringPopulationSize = 14;
+		int regionCrossoverSize = 5;
 		double proporcionGreedy = 4 / 5.0;
 		Map<String, Map<String, Double>> informacionSuelos = GeneracionDatos.obtenerInformacionSuelos();
 		Map<String, Map<String, Double>> informacionCultivos = GeneracionDatos.obtenerInformacionCultivos();
