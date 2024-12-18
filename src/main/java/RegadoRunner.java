@@ -123,7 +123,7 @@ public class RegadoRunner {
 				new RankingAndCrowdingDistanceComparator<>());
 
 		// Creación del algoritmo NSGA-II
-		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 1000000, populationSize, matingPoolSize, offspringSize, crossover, mutation,
+		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 4000000, populationSize, matingPoolSize, offspringSize, crossover, mutation,
 				selection, new SequentialSolutionListEvaluator<>());
 
 		System.out.println("Comenzando ejecución del algoritmo...");

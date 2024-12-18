@@ -21,7 +21,7 @@ public class Main {
 		int tamañoPoblacion = 24;
 		int matingPoolSize = 20;
 		int offspringPopulationSize = 18;
-		int regionCrossoverSize = 5;
+		int regionCrossoverSize = 3;
 		double proporcionGreedy = 4 / 5.0;
 		Map<String, Map<String, Double>> informacionSuelos = GeneracionDatos.obtenerInformacionSuelos();
 		Map<String, Map<String, Double>> informacionCultivos = GeneracionDatos.obtenerInformacionCultivos();

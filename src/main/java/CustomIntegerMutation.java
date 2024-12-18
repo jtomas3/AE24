@@ -25,7 +25,6 @@ public class CustomIntegerMutation extends IntegerPolynomialMutation {
         index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
         mergeAdjacentSprinklers(solution, index);
 
-
         // Aplica la mutación adicional para colocar aspersores aislados
         if (JMetalRandom.getInstance().nextDouble() < 0.1) {  // Probabilidad adicional de mover un aspersor
             index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
@@ -33,7 +32,7 @@ public class CustomIntegerMutation extends IntegerPolynomialMutation {
         }
 
         // Aplica la mutación adicional para mover aspersores si es posible
-        if (JMetalRandom.getInstance().nextDouble() < 0.1) {  // Probabilidad adicional de mover un aspersor
+        if (JMetalRandom.getInstance().nextDouble() < 0.05) {  // Probabilidad adicional de mover un aspersor
             index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
             moveSprinklerIfPossible(solution, index);
         }
