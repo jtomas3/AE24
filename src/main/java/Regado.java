@@ -117,40 +117,6 @@ public class Regado extends AbstractIntegerProblem {
 			int tipoAspersor = solution.getVariable(i);
 			int row = i / n;
 			int col = i % n;
-			// Si no hay aspersores en los alrededores, se coloca un aspersor con
-			// probabilidad baja
-			int random = (int) (Math.random() * 100);
-			// Heuristica: Se checkea que no se trate del caso donde no hay aspersores en un
-			// 3x3.
-			if (tipoAspersor == 0 && random < 3) {
-				// Convertir índice lineal a coordenadas 2D
-				boolean foundAspersor = false;
-				for (int dRow = -1; dRow <= 1; dRow++) {
-					for (int dCol = -1; dCol <= 1; dCol++) {
-						if (dRow == 0 && dCol == 0)
-							continue; // Saltar la parcela actual
-						int neighborRow = row + dRow;
-						int neighborCol = col + dCol;
-						if (neighborRow >= 0 && neighborRow < n && neighborCol >= 0 && neighborCol < n) {
-							int neighborIndex = neighborRow * n + neighborCol;
-							if (solution.getVariable(neighborIndex) > 0) {
-								foundAspersor = true;
-								break;
-							}
-						}
-					}
-					if (foundAspersor)
-						break;
-				}
-
-				if (!foundAspersor) {
-					// Colocar un aspersor en la parcela actual si no hay en los alrededores
-					solution.setVariable(i, 2);
-					solution.setVariable(i + n * n, 10); // Establecer tiempo de riego a 10 default
-					tipoAspersor = 1; // Actualizar el tipo de aspersor para continuar con la evaluación
-				}
-			}
-
 			costoTotal += calcularCosto(tipoAspersor, solution.getVariable(i + n * n), row, col, solution); // Calcula el costo
 																									// total, con el
 																									// tiempo
@@ -178,13 +144,13 @@ public class Regado extends AbstractIntegerProblem {
 			break;
 		}
 
-		if (tiempoEncendido < 9 && costo != 0) {
+		if (tiempoEncendido < 8 && costo != 0) {
 			costo += (10 - tiempoEncendido) / 2;
 		}
 
 		// Penalizar aspersores en bordes del campo
 		if (i == 0 || i == n - 1 || j == 0 || j == n - 1 && costo != 0) {
-			costo += 4;
+			costo += 3;
 		}
 
 		return costo;

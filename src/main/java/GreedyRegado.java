@@ -101,11 +101,11 @@ public class GreedyRegado {
 
       // Probabilidad de añadir un aspersor disminuye según el número de aspersores adyacentes
       double probabilidadBase = 1; // Probabilidad base de colocar un aspersor si no hay adyacentes
-      double probabilidad = probabilidadBase * Math.pow(0.55, aspersoresAdyacentes); // Reduce por cada aspersor adyacente
+      double probabilidad = probabilidadBase * Math.pow(0.7, aspersoresAdyacentes); // Reduce por cada aspersor adyacente
       boolean yaTieneAspersor = configuracionAspersores[i][j] > 0;
       // Evaluar cada tipo de aspersor con tiempos de riego incrementales
       for (int tipo = 0; tipo <= 2; tipo++) {
-          for (int tiempo = tiempoMinimo; tiempo <= tiempoMaximo; tiempo += 1) { // Incrementos de 2
+          for (int tiempo = tiempoMinimo; tiempo <= tiempoMaximo; tiempo += 2) { // Incrementos de 2
               double costo = calcularCosto(tipo, tiempo, i, j);
               configuracionAspersores[i][j] = tipo;
               tiemposRiego[i][j] = tiempo;
@@ -159,13 +159,13 @@ public class GreedyRegado {
                 break;
         }
 
-        if (tiempoEncendido < 9 && costo != 0) {
-            costo += (10 - tiempoEncendido);
+        if (tiempoEncendido < 8 && costo != 0) {
+            costo += (10 - tiempoEncendido)/2;
         }
 
         // Penalizar aspersores en bordes del campo
         if (i == 0 || i == n - 1 || j == 0 || j == n - 1 && costo != 0) {
-            costo += 2;
+            costo += 3;
         }
 
         return costo;
@@ -184,7 +184,6 @@ public class GreedyRegado {
       return desviacionTotal;
     }
 
-    // TODO: Sacar parametros no usados
     private double calcularDesviacionHidricaParcela(int i, int j, int tipo, int tiempo, double[][] riegoTotal) {
       double desviacionTotal = 0.0;
 

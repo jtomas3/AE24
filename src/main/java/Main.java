@@ -9,19 +9,20 @@ import java.util.concurrent.Future;
 public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
-		int n = 40;
+		int n = 20;
 		double alpha = 0.9;
 		double beta = 0.8;
 		int costoTipo1 = 1;
 		int costoTipo2 = 1;
 		int costoTipo3 = 1;
-		int riegoPorMinuto = 40;
+		int riegoPorMinuto = 10;
 		int tiempoMinimo = 4;
 		int tiempoMaximo = 30;
-		int tamañoPoblacion = 50;
-		int matingPoolSize = 40;
-		int offspringPopulationSize = 35;
-		double proporcionGreedy = 4 / 5.0;
+		int tamañoPoblacion = 20;
+		int matingPoolSize = 16;
+		int offspringPopulationSize = 14;
+		int regionCrossoverSize = 3;
+		double proporcionGreedy = 2 / 5.0;
 		Map<String, Map<String, Double>> informacionSuelos = GeneracionDatos.obtenerInformacionSuelos();
 		Map<String, Map<String, Double>> informacionCultivos = GeneracionDatos.obtenerInformacionCultivos();
 		String[][] cultivosCampo = GeneracionDatos.obtenerCultivosCampo(n);
@@ -110,14 +111,14 @@ public class Main {
 		case 1:
 			System.out.println("Ejecutando el algoritmo una vez...");
 			runner.runAlgorithmOnce(problema, desbalanceMaximo, costoMaximo, tamañoPoblacion, matingPoolSize,
-					offspringPopulationSize);
+					offspringPopulationSize, regionCrossoverSize);
 			break;
 
 		case 2:
 			System.out.println("Ingrese el número de ejecuciones:");
 			int numEjecuciones = scanner.nextInt();
 			runner.runMultipleExecutions(problema, numEjecuciones, desbalanceMaximo, costoMaximo, tamañoPoblacion,
-					matingPoolSize, offspringPopulationSize);
+					matingPoolSize, offspringPopulationSize, regionCrossoverSize);
 			break;
 
 		default:

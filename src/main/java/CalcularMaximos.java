@@ -1,7 +1,6 @@
 import java.util.Map;
 
 public class CalcularMaximos {
-    // TODO: Usar una clase abstracta para CalcularMaximos y GreedyRegado, hay duplciados
     private int n;
     private double alpha;
     private double beta;
@@ -74,27 +73,25 @@ public class CalcularMaximos {
         double[][] riegoTotal = calcularRiegoTotalCampo(configuracionAspersores, tiemposRiego);
 
         // Calcular desviacion hídrica
-        double desviacionTotal = calcularDesviacionHidrica(riegoTotal, n, configuracionAspersores, tiemposRiego);
+        double desviacionTotal = calcularDesviacionHidrica(riegoTotal, n);
 
         return desviacionTotal;
     }
 
-    // TODO: Metodos duplicados de GreedyRegado
-    private double calcularDesviacionHidrica(double[][] riegoTotal, int n, int[][] configuracionAspersores, int[][] tiemposRiego) {
+    private double calcularDesviacionHidrica(double[][] riegoTotal, int n) {
         double desviacionTotal = 0.0;
 
         // Calcular la desviación hídrica para cada parcela
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                desviacionTotal += calcularDesviacionHidricaParcela(i, j, configuracionAspersores[i][j], tiemposRiego[i][j], riegoTotal);
+                desviacionTotal += calcularDesviacionHidricaParcela(i, j, riegoTotal);
             }
         }
 
         return desviacionTotal;
     }
 
-    // TODO: Sacar parametros no usados
-    private double calcularDesviacionHidricaParcela(int i, int j, int tipo, int tiempo, double[][] riegoTotal) {
+    private double calcularDesviacionHidricaParcela(int i, int j, double[][] riegoTotal) {
         double desviacionTotal = 0.0;
 
         // Calcular la desviación hídrica para la parcela actual
