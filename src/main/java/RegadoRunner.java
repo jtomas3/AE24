@@ -5,6 +5,7 @@ import org.uma.jmetal.operator.selection.impl.BinaryTournamentSelection;
 import org.uma.jmetal.solution.integersolution.IntegerSolution;
 import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
 import org.uma.jmetal.util.evaluator.impl.SequentialSolutionListEvaluator;
+import org.uma.jmetal.util.solutionattribute.impl.DominanceRanking;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,68 +18,74 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class RegadoRunner {
-	public void runAlgorithmOnce(Regado problem, double maxObjective0, int maxObjective1, int populationSize, int matingPoolSize, int offspringSize, int regionCrossoverSize) {
-		List<IntegerSolution> bestSolutions = runAlgorithm(problem, maxObjective0, maxObjective1, populationSize, matingPoolSize, offspringSize, regionCrossoverSize);
+	public void runAlgorithmOnce(Regado problem, double maxObjective0, int maxObjective1, int populationSize,
+			int matingPoolSize, int offspringSize, int regionCrossoverSize) {
+		List<IntegerSolution> bestSolutions = runAlgorithm(problem, maxObjective0, maxObjective1, populationSize,
+				matingPoolSize, offspringSize, regionCrossoverSize);
 
 		int counter = 0;
 		for (IntegerSolution solution : bestSolutions) {
 			counter++;
 			int n = problem.n;
-			//System.out.println(" ");
+			// System.out.println(" ");
 			// Imprimir la solución como matriz
-			//System.out.println("---------------------------------*");
-			//System.out.println("Solución: " + counter);
+			// System.out.println("---------------------------------*");
+			// System.out.println("Solución: " + counter);
 			for (int i = 0; i < n; i++) {
 				for (int j = 0; j < n; j++) {
 					int index = i * n + j;
-					//System.out.print(
-					//		solution.getVariable(index) + " (" + solution.getVariable(index + (n * n)) + " min.) ");
+					// System.out.print(
+					// solution.getVariable(index) + " (" + solution.getVariable(index + (n * n)) +
+					// " min.) ");
 				}
-				//System.out.println();
+				// System.out.println();
 			}
 
 			double[][] riegoTotal = problem.calcularRiegoTotalCampo(solution);
 
 			// Imprimir el agua optima y real en cada parcela
-			//System.out.println("Agua óptima y real:");
+			// System.out.println("Agua óptima y real:");
 			for (int i = 0; i < n; i++) {
 				for (int j = 0; j < n; j++) {
 					double aguaOptima = problem.informacionSuelos.get(problem.suelosCampo[i][j]).get("h_campo")
 							- problem.informacionSuelos.get(problem.suelosCampo[i][j]).get("h_marchitez")
 							+ problem.informacionCultivos.get(problem.cultivosCampo[i][j]).get("agua_requerida");
-					//System.out.print(aguaOptima + " (" + riegoTotal[i][j] + ") ");
+					// System.out.print(aguaOptima + " (" + riegoTotal[i][j] + ") ");
 				}
-				//System.out.println();
+				// System.out.println();
 			}
 
 			// Calcular diferencia hídrica de cada parcela
 			double[][] desviacionHidrica = new double[n][n];
 			// Imprimir campo
-			//System.out.println("Balance de riego:");
+			// System.out.println("Balance de riego:");
 			for (int i = 0; i < n; i++) {
 				for (int j = 0; j < n; j++) {
 					int index = i * n + j;
 					desviacionHidrica[i][j] = problem.calcularDesviacionHidricaRelativaParcela(index, riegoTotal);
-					//System.out.print(desviacionHidrica[i][j] + " ");
+					// System.out.print(desviacionHidrica[i][j] + " ");
 				}
-				//System.out.println();
+				// System.out.println();
 			}
 
-			//System.out.println("Objective 0 (Diferencia hídrica total): " + solution.getObjective(0));
-			//System.out.println("Objective 1 (Costo): " + solution.getObjective(1));
+			// System.out.println("Objective 0 (Diferencia hídrica total): " +
+			// solution.getObjective(0));
+			// System.out.println("Objective 1 (Costo): " + solution.getObjective(1));
 			exportarIrrigacionCSV(riegoTotal, "riegoTotal_" + counter + ".csv");
 			exportarAspersoresCSV(solution, "aspersores_" + counter + ".csv");
 		}
 	}
 
-	public void runMultipleExecutions(Regado problem, int numExecutions, double maxObjective0, int maxObjective1, int populationSize, int matingPoolSize, int offspringSize, int regionCrossoverSize) {
+	public void runMultipleExecutions(Regado problem, int numExecutions, double maxObjective0, int maxObjective1,
+			int populationSize, int matingPoolSize, int offspringSize, int regionCrossoverSize) {
 		List<List<IntegerSolution>> bestSolutions = new ArrayList<>();
 		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<Callable<List<IntegerSolution>>> tasks = new ArrayList<>();
 
 		for (int i = 0; i < numExecutions; i++) {
 			// Crear una tarea para cada ejecución
-			tasks.add(() -> runAlgorithm(problem, maxObjective0, maxObjective1, populationSize, matingPoolSize, offspringSize, regionCrossoverSize));
+			tasks.add(() -> runAlgorithm(problem, maxObjective0, maxObjective1, populationSize, matingPoolSize,
+					offspringSize, regionCrossoverSize));
 		}
 
 		try {
@@ -115,16 +122,27 @@ public class RegadoRunner {
 		exportBestSolutionsToCSV(weighted2, "weighted2.csv");
 	}
 
-	private List<IntegerSolution> runAlgorithm(Regado problem, double maxObjective0, int maxObjective1, int populationSize, int matingPoolSize, int offspringSize, int regionCrossoverSize) {
+	private List<IntegerSolution> runAlgorithm(Regado problem, double maxObjective0, int maxObjective1,
+			int populationSize, int matingPoolSize, int offspringSize, int regionCrossoverSize) {
 		// Configuración de los operadores
-		CrossoverOperator<IntegerSolution> crossover = new CustomRegionalIntegerSBXCrossover(0.5, regionCrossoverSize); // Segundo parametro es la dimension de los cuadrados para el cruce
-		MutationOperator<IntegerSolution> mutation = new CustomIntegerMutation(0.06, 8.0);
+		CrossoverOperator<IntegerSolution> crossover = new CustomRegionalIntegerSBXCrossover(0.9, regionCrossoverSize); // Segundo
+																														// parametro
+																														// es
+																														// la
+																														// dimension
+																														// de
+																														// los
+																														// cuadrados
+																														// para
+																														// el
+																														// cruce
+		MutationOperator<IntegerSolution> mutation = new CustomIntegerMutation(0.01, 8.0);
 		SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(
 				new RankingAndCrowdingDistanceComparator<>());
 
 		// Creación del algoritmo NSGA-II
-		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 1000000, populationSize, matingPoolSize, offspringSize, crossover, mutation,
-				selection, new SequentialSolutionListEvaluator<>());
+		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 3000000, populationSize, matingPoolSize,
+				offspringSize, crossover, mutation, selection, new SequentialSolutionListEvaluator<>());
 
 		System.out.println("Comenzando ejecución del algoritmo...");
 		// Ejecutar el algoritmo
@@ -136,6 +154,14 @@ public class RegadoRunner {
 
 		// Obtención de la solución
 		List<IntegerSolution> population = algorithm.getResult();
+
+		// Calcular ranking de dominancia
+		DominanceRanking<IntegerSolution> ranking = new DominanceRanking<>();
+		ranking.computeRanking(population);
+
+		List<IntegerSolution> paretoFront = ranking.getSubFront(0);
+
+		exportarFrenteDeParetoCSV(paretoFront, "paretoFront.csv");
 
 		IntegerSolution bestSolution = population.get(0);
 
@@ -173,8 +199,10 @@ public class RegadoRunner {
 
 		List<IntegerSolution> prioritizedSolutions = new ArrayList<>();
 		for (IntegerSolution solution : population) {
-			// Normalizar los objetivos usando la media y desviación estándar, con valor absoluto
-			double normalizedObjective0 = Math.abs((solution.getObjective(0) - (avgObjective0 / 10)) / stdDevObjective0);
+			// Normalizar los objetivos usando la media y desviación estándar, con valor
+			// absoluto
+			double normalizedObjective0 = Math
+					.abs((solution.getObjective(0) - (avgObjective0 / 10)) / stdDevObjective0);
 			double normalizedObjective1 = Math.abs((solution.getObjective(1) - avgObjective1) / stdDevObjective1);
 			// Fitness ponderado
 			double weightedScore = 0.9 * normalizedObjective0 + 0.1 * normalizedObjective1; // Normalizar
@@ -196,58 +224,61 @@ public class RegadoRunner {
 		bestSolutions.add(bestSolution);
 		int counter = 0;
 		for (IntegerSolution solution : bestSolutions) {
-				counter++;
-				int n = problem.n;
-				System.out.println(" ");
-				// Imprimir la solución como matriz
-				System.out.println("---------------------------------*");
-				System.out.println("Solución: "+ counter);
-				// for (int i = 0; i < n; i++) {
-				// 	for (int j = 0; j < n; j++) {
-				// 		int index = i * n + j;
-				// 		System.out.print(
-				// 				solution.getVariable(index) + " (" + solution.getVariable(index + (n * n)) + " min.) ");
-				// 	}
-				// 	System.out.println();
-				// }
+			counter++;
+			int n = problem.n;
+			System.out.println(" ");
+			// Imprimir la solución como matriz
+			System.out.println("---------------------------------*");
+			System.out.println("Solución: " + counter);
+			// for (int i = 0; i < n; i++) {
+			// for (int j = 0; j < n; j++) {
+			// int index = i * n + j;
+			// System.out.print(
+			// solution.getVariable(index) + " (" + solution.getVariable(index + (n * n)) +
+			// " min.) ");
+			// }
+			// System.out.println();
+			// }
 
-				double[][] riegoTotal = problem.calcularRiegoTotalCampo(solution);
+			double[][] riegoTotal = problem.calcularRiegoTotalCampo(solution);
 
-				// Imprimir el agua optima y real en cada parcela
-				// System.out.println("Agua óptima y real:");
-				// for (int i = 0; i < n; i++) {
-				// 	for (int j = 0; j < n; j++) {
-				// 		double aguaOptima = problem.informacionSuelos.get(problem.suelosCampo[i][j]).get("h_campo")
-				// 				- problem.informacionSuelos.get(problem.suelosCampo[i][j]).get("h_marchitez")
-				// 				+ problem.informacionCultivos.get(problem.cultivosCampo[i][j]).get("agua_requerida");
-				// 		System.out.print(aguaOptima + " (" + riegoTotal[i][j] + ") ");
-				// 	}
-				// 	System.out.println();
-				// }
+			// Imprimir el agua optima y real en cada parcela
+			// System.out.println("Agua óptima y real:");
+			// for (int i = 0; i < n; i++) {
+			// for (int j = 0; j < n; j++) {
+			// double aguaOptima =
+			// problem.informacionSuelos.get(problem.suelosCampo[i][j]).get("h_campo")
+			// - problem.informacionSuelos.get(problem.suelosCampo[i][j]).get("h_marchitez")
+			// +
+			// problem.informacionCultivos.get(problem.cultivosCampo[i][j]).get("agua_requerida");
+			// System.out.print(aguaOptima + " (" + riegoTotal[i][j] + ") ");
+			// }
+			// System.out.println();
+			// }
 
-				// Calcular diferencia hídrica de cada parcela
-				double[][] desviacionHidrica = new double[n][n];
-				double desviacionHidricaReal = 0;
-				// Imprimir campo
-				// System.out.println("Balance de riego:");
-				 for (int i = 0; i < n; i++) {
-				 	for (int j = 0; j < n; j++) {
-				 		int index = i * n + j;
-				 		desviacionHidrica[i][j] = problem.calcularDesviacionHidricaRelativaParcela(index, riegoTotal);
-				 		desviacionHidricaReal += Math.abs(desviacionHidrica[i][j]);
-						
-				 		System.out.print(desviacionHidrica[i][j] + " ");
-				 	}
-				 	System.out.println();
-				 }
+			// Calcular diferencia hídrica de cada parcela
+			double[][] desviacionHidrica = new double[n][n];
+			double desviacionHidricaReal = 0;
+			// Imprimir campo
+			// System.out.println("Balance de riego:");
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
+					int index = i * n + j;
+					desviacionHidrica[i][j] = problem.calcularDesviacionHidricaRelativaParcela(index, riegoTotal);
+					desviacionHidricaReal += Math.abs(desviacionHidrica[i][j]);
 
-				System.out.println("Objective 0 (Diferencia hídrica total): " + solution.getObjective(0));
-				System.out.println("Objective 1 (Costo): " + solution.getObjective(1));
-				System.out.println("Desviación hídrica real: " + desviacionHidricaReal);
-				System.out.println("Cantidad de aspersores: " + contarAspersores(solution));
-				exportarIrrigacionCSV(riegoTotal, "riegoTotal_"+counter+".csv");
-				exportarAspersoresCSV(solution, "aspersores_"+counter+".csv");
+					System.out.print(desviacionHidrica[i][j] + " ");
+				}
+				System.out.println();
 			}
+
+			System.out.println("Objective 0 (Diferencia hídrica total): " + solution.getObjective(0));
+			System.out.println("Objective 1 (Costo): " + solution.getObjective(1));
+			System.out.println("Desviación hídrica real: " + desviacionHidricaReal);
+			System.out.println("Cantidad de aspersores: " + contarAspersores(solution));
+			exportarIrrigacionCSV(riegoTotal, "riegoTotal_" + counter + ".csv");
+			exportarAspersoresCSV(solution, "aspersores_" + counter + ".csv");
+		}
 
 		return bestSolutions;
 	}
@@ -304,6 +335,19 @@ public class RegadoRunner {
 					writer.write(solution.getVariable(index) + ",");
 				}
 				writer.write("\n");
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void exportarFrenteDeParetoCSV(List<IntegerSolution> paretoFront, String fileName) {
+		try {
+			FileWriter writer = new FileWriter(fileName);
+			writer.write("Objective 0,Objective 1\n");
+			for (IntegerSolution solution : paretoFront) {
+				writer.write(solution.getObjective(0) + "," + solution.getObjective(1) + "\n");
 			}
 			writer.close();
 		} catch (IOException e) {

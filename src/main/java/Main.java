@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
 public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
-		int n = 20;
+		int n = 10;
 		double alpha = 0.9;
 		double beta = 0.8;
 		int costoTipo1 = 1;
@@ -18,7 +18,7 @@ public class Main {
 		int riegoPorMinuto = 10;
 		int tiempoMinimo = 4;
 		int tiempoMaximo = 30;
-		int tamañoPoblacion = 20;
+		int tamañoPoblacion = 100;
 		int matingPoolSize = 16;
 		int offspringPopulationSize = 14;
 		int regionCrossoverSize = 3;
