@@ -19,8 +19,9 @@ import java.util.concurrent.Future;
 
 public class RegadoRunner {
 	public void runAlgorithmOnce(Regado problem, int populationSize,
-			int matingPoolSize, int offspringSize, int regionCrossoverSize) {
-		List<IntegerSolution> bestSolutions = runAlgorithm(problem, populationSize, matingPoolSize, offspringSize, regionCrossoverSize);
+			int matingPoolSize, int offspringSize, int regionCrossoverSize, double crossoverProb, double mutationProb, int confId, int executionId) {
+		List<IntegerSolution> bestSolutions = runAlgorithm(problem, populationSize,
+				matingPoolSize, offspringSize, regionCrossoverSize, crossoverProb, mutationProb, confId, executionId);
 
 		int counter = 0;
 		for (IntegerSolution solution : bestSolutions) {
@@ -75,14 +76,16 @@ public class RegadoRunner {
 		}
 	}
 
-	public void runMultipleExecutions(Regado problem, int numExecutions, int populationSize, int matingPoolSize, int offspringSize, int regionCrossoverSize) {
+	public void runMultipleExecutions(Regado problem, int numExecutions,
+			int populationSize, int matingPoolSize, int offspringSize, int regionCrossoverSize, double crossoverProb, double mutationProb) {
 		List<List<IntegerSolution>> bestSolutions = new ArrayList<>();
 		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<Callable<List<IntegerSolution>>> tasks = new ArrayList<>();
 
 		for (int i = 0; i < numExecutions; i++) {
 			// Crear una tarea para cada ejecución
-			tasks.add(() -> runAlgorithm(problem, populationSize, matingPoolSize, offspringSize, regionCrossoverSize));
+			tasks.add(() -> runAlgorithm(problem, populationSize, matingPoolSize,
+					offspringSize, regionCrossoverSize, crossoverProb, mutationProb, -1, -1));
 		}
 
 		try {
@@ -119,9 +122,10 @@ public class RegadoRunner {
 		exportBestSolutionsToCSV(weighted2, "weighted2.csv");
 	}
 
-	private List<IntegerSolution> runAlgorithm(Regado problem, int populationSize, int matingPoolSize, int offspringSize, int regionCrossoverSize) {
+	private List<IntegerSolution> runAlgorithm(Regado problem,
+			int populationSize, int matingPoolSize, int offspringSize, int regionCrossoverSize, double crossoverProb, double mutationProb, int confId, int executionId) {
 		// Configuración de los operadores
-		CrossoverOperator<IntegerSolution> crossover = new CustomRegionalIntegerSBXCrossover(0.6, regionCrossoverSize); // Segundo
+		CrossoverOperator<IntegerSolution> crossover = new CustomRegionalIntegerSBXCrossover(crossoverProb, regionCrossoverSize); // Segundo
 																														// parametro
 																														// es
 																														// la
@@ -132,7 +136,7 @@ public class RegadoRunner {
 																														// para
 																														// el
 																														// cruce
-		MutationOperator<IntegerSolution> mutation = new CustomIntegerMutation(0.022, 8.0);
+		MutationOperator<IntegerSolution> mutation = new CustomIntegerMutation(mutationProb, 8.0);
 		SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(
 				new RankingAndCrowdingDistanceComparator<>());
 
@@ -151,13 +155,20 @@ public class RegadoRunner {
 		// Obtención de la solución
 		List<IntegerSolution> population = algorithm.getResult();
 
-		// Calcular ranking de dominancia
-		DominanceRanking<IntegerSolution> ranking = new DominanceRanking<>();
-		ranking.computeRanking(population);
+		if (confId != -1) {
+			// Calcular ranking de dominancia
+			DominanceRanking<IntegerSolution> ranking = new DominanceRanking<>();
+			ranking.computeRanking(population);
 
-		List<IntegerSolution> paretoFront = ranking.getSubFront(0);
-
-		exportarFrenteDeParetoCSV(paretoFront, "paretoFront.csv");
+			List<IntegerSolution> paretoFront = ranking.getSubFront(0);
+			
+			// Guardar el csv en el directorio de resultados/confId en un archivo con el nombre paretoExecutionId.csv
+			
+			// Directorio:
+			String directory = "resultados/conf_" + confId + "/";
+			
+			exportarFrenteDeParetoCSV(paretoFront, "pareto" + executionId + ".csv", directory);
+		} 
 
 		IntegerSolution bestSolution = population.get(0);
 
@@ -338,9 +349,9 @@ public class RegadoRunner {
 		}
 	}
 
-	private static void exportarFrenteDeParetoCSV(List<IntegerSolution> paretoFront, String fileName) {
+	private static void exportarFrenteDeParetoCSV(List<IntegerSolution> paretoFront, String fileName, String directory) {
 		try {
-			FileWriter writer = new FileWriter(fileName);
+			FileWriter writer = new FileWriter(directory + fileName);
 			writer.write("Objective 0,Objective 1\n");
 			for (IntegerSolution solution : paretoFront) {
 				writer.write(solution.getObjective(0) + "," + solution.getObjective(1) + "\n");
