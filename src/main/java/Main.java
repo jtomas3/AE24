@@ -17,7 +17,7 @@ public class Main {
 		int riegoPorMinuto = 10;
 		int tiempoMinimo = 4;
 		int tiempoMaximo = 30;
-		int tamañoPoblacion = 100;
+		int tamañoPoblacion = 30;
 		int matingPoolSize = 16;
 		int offspringPopulationSize = 14;
 		int regionCrossoverSize = 3;
