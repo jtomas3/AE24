@@ -6,7 +6,6 @@ public class GreedyRegado {
     private double beta;
     private int costoTipo1;
     private int costoTipo2;
-    private int costoTipo3;
     private int riegoPorMinuto;
     private Map<String, Map<String, Double>> informacionSuelos;
     private Map<String, Map<String, Double>> informacionCultivos;
@@ -20,13 +19,12 @@ public class GreedyRegado {
     public GreedyRegado(int n, Map<String, Map<String, Double>> informacionSuelos,
                         Map<String, Map<String, Double>> informacionCultivos, String[][] cultivosCampo,
                         String[][] suelosCampo, double alpha, double beta, int costoTipo1, int costoTipo2,
-                        int costoTipo3, int riegoPorMinuto, int tiempoMinimo, int tiempoMaximo) {
+                        int riegoPorMinuto, int tiempoMinimo, int tiempoMaximo) {
         this.n = n;
         this.alpha = alpha;
         this.beta = beta;
         this.costoTipo1 = costoTipo1;
         this.costoTipo2 = costoTipo2;
-        this.costoTipo3 = costoTipo3;
         this.riegoPorMinuto = riegoPorMinuto;
         this.informacionSuelos = informacionSuelos;
         this.informacionCultivos = informacionCultivos;
@@ -153,9 +151,6 @@ public class GreedyRegado {
                 break;
             case 2:
                 costo = costoTipo2;
-                break;
-            case 3:
-                costo = costoTipo3;
                 break;
         }
 

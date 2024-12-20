@@ -19,7 +19,6 @@ public class Regado extends AbstractIntegerProblem {
 	// Constantes
 	private final int COSTO_TIPO_1;
 	private final int COSTO_TIPO_2;
-	private final int COSTO_TIPO_3;
 
 	// Parametro X que controla cuanto riegan los aspersores por minuto
 	// - Tipo 1: solo riega una cantidad X por minuto en la
@@ -55,7 +54,7 @@ public class Regado extends AbstractIntegerProblem {
 
 	public Regado(int n, Map<String, Map<String, Double>> informacionSuelos,
 			Map<String, Map<String, Double>> informacionCultivos, String[][] cultivosCampo, String[][] sueslosCampo,
-			double alpha, double beta, int costoTipo1, int costoTipo2, int costoTipo3, int riegoPorMinuto,
+			double alpha, double beta, int costoTipo1, int costoTipo2, int riegoPorMinuto,
 			List<int[][]> greedySolutions, int tiempoMaximo, int tiempoMinimo) {
 		this.n = n;
 		this.informacionSuelos = informacionSuelos;
@@ -66,7 +65,6 @@ public class Regado extends AbstractIntegerProblem {
 		this.beta = beta;
 		this.COSTO_TIPO_1 = costoTipo1;
 		this.COSTO_TIPO_2 = costoTipo2;
-		this.COSTO_TIPO_3 = costoTipo3;
 		this.x = riegoPorMinuto;
 		this.greedySolutions = greedySolutions;
 
@@ -138,9 +136,6 @@ public class Regado extends AbstractIntegerProblem {
 			break;
 		case 2:
 			costo = COSTO_TIPO_2;
-			break;
-		case 3:
-			costo = COSTO_TIPO_3;
 			break;
 		}
 
