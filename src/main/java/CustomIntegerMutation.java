@@ -6,8 +6,11 @@ import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 import java.util.Random;
 
 public class CustomIntegerMutation extends IntegerPolynomialMutation {
+    double mutationProbability;
+
     public CustomIntegerMutation(double mutationProbability, double distributionIndex) {
         super(mutationProbability, distributionIndex);
+        this.mutationProbability = mutationProbability;
     }
 
     @Override
@@ -16,44 +19,32 @@ public class CustomIntegerMutation extends IntegerPolynomialMutation {
             throw new JMetalException("Null parameter");
         }
 
-        // Realiza mutación polinomial estándar
-        super.execute(solution);
-
-        int index;
-
-        // Aplica mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
-        index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
-        mergeAdjacentSprinklers(solution, index);
-        // Aplica mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
-        index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
-        mergeAdjacentSprinklers(solution, index);
-        // Aplica mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
-        index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
-        mergeAdjacentSprinklers(solution, index);
-
-        // Aplica mutación adicional para fusionar aspersores en línea
-        index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
-        mergeInlineSprinklers(solution, index);
-        // Aplica mutación adicional para fusionar aspersores en línea
-        index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
-        mergeInlineSprinklers(solution, index);
-        
-        // Aplica mutación adicional para colocar aspersores aislados
-        if (JMetalRandom.getInstance().nextDouble() < 0.2) {
-            index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
-            placeIsolatedSprinkler(solution, index);
-        }
-
-        // Aplica mutación adicional para mover aspersores si es posible
-        if (JMetalRandom.getInstance().nextDouble() < 0.05) {
-            index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
-            moveSprinklerIfPossible(solution, index);
-        }
-
-        // Aplica mutación adicional para centralizar aspersores
-        if (JMetalRandom.getInstance().nextDouble() < 0.1) {
-            index = JMetalRandom.getInstance().nextInt(0, (solution.getNumberOfVariables() / 2) - 1);
-            centralizeSprinkler(solution, index);
+        // Realiza mutación polinomial estándar con probabilidad 20%
+        if (JMetalRandom.getInstance().nextDouble() < 0.3) {
+            return super.execute(solution);
+        } else {
+            for (int index = 0; index < solution.getNumberOfVariables() / 2; index++) {
+                // Aplica mutación adicional para fusionar aspersores adyacentes, sobre 2 indices
+                if (JMetalRandom.getInstance().nextDouble() < (this.mutationProbability / 4)) {
+                    mergeAdjacentSprinklers(solution, index);
+                }
+                // Aplica mutación adicional para fusionar aspersores en línea, sobre 2 indices
+                if (JMetalRandom.getInstance().nextDouble() < (this.mutationProbability / 4)) {
+                    mergeInlineSprinklers(solution, index);
+                }
+                // Aplica mutación adicional para colocar aspersores aislados
+                if (JMetalRandom.getInstance().nextDouble() < (this.mutationProbability / 6)) {
+                    placeIsolatedSprinkler(solution, index);
+                }
+                // Aplica mutación adicional para mover aspersores si es posible
+                if (JMetalRandom.getInstance().nextDouble() < (this.mutationProbability / 6)) {
+                    moveSprinklerIfPossible(solution, index);
+                }
+                // Aplica mutación adicional para centralizar aspersores
+                if (JMetalRandom.getInstance().nextDouble() < (this.mutationProbability / 6)) {
+                    centralizeSprinkler(solution, index);
+                }
+            }
         }
 
         return solution;
