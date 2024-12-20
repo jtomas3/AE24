@@ -132,7 +132,7 @@ public class RegadoRunner {
 																														// para
 																														// el
 																														// cruce
-		MutationOperator<IntegerSolution> mutation = new CustomIntegerMutation(0.05, 8.0);
+		MutationOperator<IntegerSolution> mutation = new CustomIntegerMutation(0.022, 8.0);
 		SelectionOperator<List<IntegerSolution>, IntegerSolution> selection = new BinaryTournamentSelection<>(
 				new RankingAndCrowdingDistanceComparator<>());
 
