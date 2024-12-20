@@ -15,7 +15,9 @@ public class CustomDefaultIntegerSolution extends AbstractSolution<Integer> impl
 
         for (int i = 0; i < bounds.size(); ++i) {
             int greedyValue = extractGreedyValue(greedySolution, i);
-            if (greedyValue != -1) {
+            // Probabilidad de usar el valor de greedySolution en vez de uno aleatorio
+            int mutationProbability = (int) (JMetalRandom.getInstance().nextDouble() * 100);
+            if ((greedyValue != -1 && mutationProbability < 97)) {
                 // Usar el valor de greedySolution si está definido
                 this.setVariable(i, greedyValue);
             } else {
