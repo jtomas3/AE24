@@ -144,7 +144,7 @@ public class Regado extends AbstractIntegerProblem {
 		}
 
 		// Penalizar aspersores en bordes del campo
-		if (i == 0 || i == n - 1 || j == 0 || j == n - 1 && costo != 0) {
+		if ((i == 0 || i == n - 1 || j == 0 || j == n - 1) && costo != 0) {
 			costo += 3;
 		}
 

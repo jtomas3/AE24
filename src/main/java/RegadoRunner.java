@@ -83,9 +83,10 @@ public class RegadoRunner {
 		List<Callable<List<IntegerSolution>>> tasks = new ArrayList<>();
 
 		for (int i = 0; i < numExecutions; i++) {
+			int executionId = i;
 			// Crear una tarea para cada ejecución
 			tasks.add(() -> runAlgorithm(problem, populationSize, matingPoolSize,
-					offspringSize, regionCrossoverSize, crossoverProb, mutationProb, -1, -1));
+					offspringSize, regionCrossoverSize, crossoverProb, mutationProb, 123, executionId));
 		}
 
 		try {
@@ -141,7 +142,7 @@ public class RegadoRunner {
 				new RankingAndCrowdingDistanceComparator<>());
 
 		// Creación del algoritmo NSGA-II
-		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 1500000, populationSize, matingPoolSize,
+		CustomNSGAII<IntegerSolution> algorithm = new CustomNSGAII<>(problem, 3000000, populationSize, matingPoolSize,
 				offspringSize, crossover, mutation, selection, new SequentialSolutionListEvaluator<>());
 
 		System.out.println("Comenzando ejecución del algoritmo...");
@@ -166,7 +167,7 @@ public class RegadoRunner {
 			
 			// Directorio:
 			String directory = "resultados/conf_" + confId + "/";
-			
+
 			exportarFrenteDeParetoCSV(paretoFront, "pareto" + executionId + ".csv", directory);
 		} 
 
@@ -209,7 +210,7 @@ public class RegadoRunner {
 			// Normalizar los objetivos usando la media y desviación estándar, con valor
 			// absoluto
 			double normalizedObjective0 = Math
-					.abs((solution.getObjective(0) - (avgObjective0 / 10)) / stdDevObjective0);
+					.abs((solution.getObjective(0) - (avgObjective0 / 15)) / stdDevObjective0);
 			double normalizedObjective1 = Math.abs((solution.getObjective(1) - avgObjective1) / stdDevObjective1);
 			// Fitness ponderado
 			double weightedScore = 0.9 * normalizedObjective0 + 0.1 * normalizedObjective1; // Normalizar

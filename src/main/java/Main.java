@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
 public class Main {
 	public static void main(String[] args) {
 		// Configuración de parámetros del problema
-		int n = 10;
+		int n = 40;
 		double alpha = 0.9;
 		double beta = 0.8;
 		int costoTipo1 = 1;
@@ -23,8 +23,8 @@ public class Main {
 		int offspringPopulationSize = (int) Math.floor(tamañoPoblacion * 0.7);
 		int regionCrossoverSize = 3;
 		double proporcionGreedy = 2 / 5.0;
-		double probabilidadCrossover = 0.9;
-		double probabilidadMutacion = 0.01;
+		double probabilidadCrossover = 0.7;
+		double probabilidadMutacion = 0.02;
 		Map<String, Map<String, Double>> informacionSuelos = GeneracionDatos.obtenerInformacionSuelos();
 		Map<String, Map<String, Double>> informacionCultivos = GeneracionDatos.obtenerInformacionCultivos();
 		String[][] cultivosCampo = GeneracionDatos.obtenerCultivosCampo(n);
@@ -149,7 +149,7 @@ public class Main {
 		int[] poblaciones = { 20, 40, 70 };
 		double[] probabilidadesCrossover = { 0.3, 0.5, 0.7 };
 		double[] probabilidadesMutacion = { 0.01, 0.02, 0.05 };
-		int ejecucionesPorConfiguracion = 10;
+		int ejecucionesPorConfiguracion = 30;
 
 		// Crear directorios para guardar los resultados, crear un directorio por
 		// configuracion: conf_1... conf_27
